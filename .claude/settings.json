@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(./gradlew *)",
+      "Bash(JAVA_HOME=* ./gradlew *)",
+      "Bash(java *)",
+      "Bash(docker compose *)",
+      "Bash(docker build *)",
+      "Bash(docker pull *)",
+      "Bash(docker stop *)",
+      "Bash(docker rm *)",
+      "Bash(docker run *)",
+      "Bash(docker volume *)",
+      "Bash(docker context *)",
+      "Bash(docker info*)",
+      "Bash(make *)",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(npx *)",
+      "Bash(curl *)",
+      "Bash(chmod *)",
+      "Bash(kill *)",
+      "Bash(find *)",
+      "Bash(xargs *)",
+      "Bash(mkdir *)",
+      "Bash(python3 *)",
+      "Bash(git *)",
+      "Bash(gh *)",
+      "Bash(terraform *)",
+      "Bash(aws *)"
+    ]
+  }
+}

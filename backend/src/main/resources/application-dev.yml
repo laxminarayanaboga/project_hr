@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hrapp
+    username: hrapp
+    password: hrapp_dev
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+app:
+  jwt:
+    secret: dev-secret-change-in-production-must-be-at-least-256-bits-long
+  aws:
+    region: eu-west-2
+    s3:
+      documents-bucket: hrapp-documents-dev
+    ses:
+      from-address: noreply@hrapp.dev
+  cors:
+    allowed-origins: http://localhost:5173
+
+logging:
+  level:
+    com.hrapp: DEBUG
+    org.springframework.security: DEBUG

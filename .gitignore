@@ -1,0 +1,59 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+mvnw
+!.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot
+*.log
+logs/
+
+# Node / React
+node_modules/
+dist/
+.next/
+.nuxt/
+frontend/.env.local
+frontend/.env.production
+
+# Environment files (NEVER commit real secrets)
+.env
+.env.local
+.env.production
+*.env
+
+# Terraform
+infrastructure/.terraform/
+infrastructure/*.tfstate
+infrastructure/*.tfstate.backup
+infrastructure/terraform.tfvars
+infrastructure/.terraform.lock.hcl
+infrastructure/crash.log
+
+# React Native
+mobile/node_modules/
+mobile/.gradle/
+mobile/android/build/
+mobile/ios/build/
+mobile/ios/Pods/
+mobile/*.jks
+mobile/*.keystore
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# AWS
+.aws/
