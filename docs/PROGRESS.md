@@ -25,7 +25,7 @@
 ### Week 3–4: Authentication
 | Status | Issue | Story |
 |--------|-------|-------|
-| ⬜ | [#5](https://github.com/laxminarayanaboga/project_hr/issues/5) | Company registration — POST /auth/register |
+| ✅ | [#5](https://github.com/laxminarayanaboga/project_hr/issues/5) | Company registration — POST /auth/register |
 | ⬜ | [#6](https://github.com/laxminarayanaboga/project_hr/issues/6) | User login with JWT — POST /auth/login |
 | ⬜ | [#7](https://github.com/laxminarayanaboga/project_hr/issues/7) | Token refresh & logout |
 | ⬜ | [#8](https://github.com/laxminarayanaboga/project_hr/issues/8) | Password reset flow |

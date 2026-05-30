@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import LoginPage from './LoginPage'
@@ -39,6 +40,7 @@ describe('LoginPage', () => {
   it('shows validation error when email is invalid', async () => {
     renderLogin()
     fireEvent.change(screen.getByPlaceholderText(/you@company/i), { target: { value: 'not-an-email' } })
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'Password123!' } })
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }))
     await waitFor(() => expect(screen.getByText(/valid email/i)).toBeInTheDocument())
   })
