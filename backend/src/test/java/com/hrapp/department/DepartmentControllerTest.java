@@ -6,6 +6,7 @@ import com.hrapp.common.exception.GlobalExceptionHandler;
 import com.hrapp.common.exception.ResourceNotFoundException;
 import com.hrapp.department.dto.CreateDepartmentRequest;
 import com.hrapp.department.dto.DepartmentResponse;
+import com.hrapp.department.dto.OrgChartNodeDto;
 import com.hrapp.department.dto.UpdateDepartmentRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,35 @@ class DepartmentControllerTest {
 
     private DepartmentResponse stubDept(UUID id, String name, UUID parentId, String parentName) {
         return new DepartmentResponse(id, name, "A team", parentId, parentName);
+    }
+
+    // ── GET /departments/org-chart ────────────────────────────────────────────
+
+    @Test
+    void orgChart_200_returnsEmptyList() throws Exception {
+        when(departmentService.getOrgChart()).thenReturn(List.of());
+
+        mvc.perform(get("/api/v1/departments/org-chart"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void orgChart_200_returnsTree() throws Exception {
+        UUID childId = UUID.randomUUID();
+        OrgChartNodeDto child = new OrgChartNodeDto(childId, "Frontend", null, 2L, List.of());
+        OrgChartNodeDto root = new OrgChartNodeDto(DEPT_ID, "Engineering", "Builds things", 5L, List.of(child));
+
+        when(departmentService.getOrgChart()).thenReturn(List.of(root));
+
+        mvc.perform(get("/api/v1/departments/org-chart"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].name").value("Engineering"))
+                .andExpect(jsonPath("$.data[0].employeeCount").value(5))
+                .andExpect(jsonPath("$.data[0].children[0].name").value("Frontend"))
+                .andExpect(jsonPath("$.data[0].children[0].employeeCount").value(2));
     }
 
     // ── GET /departments ──────────────────────────────────────────────────────

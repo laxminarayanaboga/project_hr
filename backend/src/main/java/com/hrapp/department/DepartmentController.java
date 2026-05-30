@@ -3,6 +3,7 @@ package com.hrapp.department;
 import com.hrapp.common.response.ApiResponse;
 import com.hrapp.department.dto.CreateDepartmentRequest;
 import com.hrapp.department.dto.DepartmentResponse;
+import com.hrapp.department.dto.OrgChartNodeDto;
 import com.hrapp.department.dto.UpdateDepartmentRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,11 @@ import java.util.UUID;
 public class DepartmentController {
 
     private final DepartmentService departmentService;
+
+    @GetMapping("/org-chart")
+    public ResponseEntity<ApiResponse<List<OrgChartNodeDto>>> orgChart() {
+        return ResponseEntity.ok(ApiResponse.success(departmentService.getOrgChart(), "Org chart retrieved"));
+    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<DepartmentResponse>>> list() {

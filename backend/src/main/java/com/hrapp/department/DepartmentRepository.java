@@ -19,4 +19,12 @@ public interface DepartmentRepository extends JpaRepository<Department, UUID> {
     @Query(value = "SELECT COUNT(*) FROM employees WHERE department_id = :deptId AND employment_status != 'TERMINATED'",
             nativeQuery = true)
     long countActiveEmployees(@Param("deptId") UUID deptId);
+
+    @Query(value = """
+            SELECT department_id, COUNT(*) as cnt
+            FROM employees
+            WHERE company_id = :companyId AND employment_status != 'TERMINATED' AND department_id IS NOT NULL
+            GROUP BY department_id
+            """, nativeQuery = true)
+    List<Object[]> countEmployeesGroupedByDepartment(@Param("companyId") UUID companyId);
 }

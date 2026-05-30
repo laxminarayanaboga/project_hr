@@ -5,19 +5,65 @@ import com.hrapp.common.exception.ResourceNotFoundException;
 import com.hrapp.common.multitenancy.TenantContext;
 import com.hrapp.department.dto.CreateDepartmentRequest;
 import com.hrapp.department.dto.DepartmentResponse;
+import com.hrapp.department.dto.OrgChartNodeDto;
 import com.hrapp.department.dto.UpdateDepartmentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
+
+    @Transactional(readOnly = true)
+    public List<OrgChartNodeDto> getOrgChart() {
+        UUID companyId = TenantContext.getCurrentCompany();
+        List<Department> allDepts = departmentRepository.findAllByCompanyIdOrderByName(companyId);
+
+        Map<UUID, Long> countByDept = departmentRepository.countEmployeesGroupedByDepartment(companyId)
+                .stream()
+                .collect(Collectors.toMap(
+                        row -> UUID.fromString(row[0].toString()),
+                        row -> ((Number) row[1]).longValue()
+                ));
+
+        Map<UUID, OrgChartNodeDto> nodeMap = new LinkedHashMap<>();
+        for (Department dept : allDepts) {
+            nodeMap.put(dept.getId(), new OrgChartNodeDto(
+                    dept.getId(),
+                    dept.getName(),
+                    dept.getDescription(),
+                    countByDept.getOrDefault(dept.getId(), 0L),
+                    new ArrayList<>()
+            ));
+        }
+
+        List<OrgChartNodeDto> roots = new ArrayList<>();
+        for (Department dept : allDepts) {
+            OrgChartNodeDto node = nodeMap.get(dept.getId());
+            if (dept.getParent() == null) {
+                roots.add(node);
+            } else {
+                OrgChartNodeDto parentNode = nodeMap.get(dept.getParent().getId());
+                if (parentNode != null) {
+                    parentNode.children().add(node);
+                } else {
+                    roots.add(node);
+                }
+            }
+        }
+
+        return roots;
+    }
 
     @Transactional(readOnly = true)
     public List<DepartmentResponse> listDepartments() {
