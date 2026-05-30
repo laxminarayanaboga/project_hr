@@ -146,6 +146,41 @@ test.describe('POST /auth/logout', () => {
   })
 })
 
+test.describe('POST /auth/forgot-password', () => {
+  test('returns 200 for a registered email', async ({ request }) => {
+    const company = testCompany('forgotpw')
+    await request.post(`${API}/auth/register`, { data: company })
+
+    const res = await request.post(`${API}/auth/forgot-password`, {
+      data: { email: company.email },
+    })
+
+    expect(res.status()).toBe(200)
+    const body = await res.json()
+    expect(body.success).toBe(true)
+  })
+
+  test('returns 200 for an unknown email (prevents enumeration)', async ({ request }) => {
+    const res = await request.post(`${API}/auth/forgot-password`, {
+      data: { email: 'nobody@nowhere-at-all.com' },
+    })
+
+    expect(res.status()).toBe(200)
+    const body = await res.json()
+    expect(body.success).toBe(true)
+  })
+
+  test('returns 400 for an invalid email format', async ({ request }) => {
+    const res = await request.post(`${API}/auth/forgot-password`, {
+      data: { email: 'not-an-email' },
+    })
+
+    expect(res.status()).toBe(400)
+    const body = await res.json()
+    expect(body.error).toBe('VALIDATION_ERROR')
+  })
+})
+
 test.describe('Protected routes', () => {
   test('returns 401 when no Authorization header', async ({ request }) => {
     const res = await request.get(`${API}/employees`)

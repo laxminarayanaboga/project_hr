@@ -2,10 +2,12 @@ package com.hrapp.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrapp.auth.dto.AuthResponse;
+import com.hrapp.auth.dto.ForgotPasswordRequest;
 import com.hrapp.auth.dto.LoginRequest;
 import com.hrapp.auth.dto.RefreshRequest;
 import com.hrapp.auth.dto.RefreshResponse;
 import com.hrapp.auth.dto.RegisterRequest;
+import com.hrapp.auth.dto.ResetPasswordRequest;
 import com.hrapp.auth.dto.UserInfo;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.common.exception.GlobalExceptionHandler;
@@ -251,6 +253,93 @@ class AuthControllerTest {
         mvc.perform(post("/api/v1/auth/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"refreshToken\":\"\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    // ── POST /forgot-password ─────────────────────────────────────────────────
+
+    @Test
+    void forgotPassword_200_onValidEmail() throws Exception {
+        Mockito.doNothing().when(authService).forgotPassword(any());
+
+        mvc.perform(post("/api/v1/auth/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new ForgotPasswordRequest("hr@acme.com"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void forgotPassword_200_forUnknownEmail() throws Exception {
+        Mockito.doNothing().when(authService).forgotPassword(any());
+
+        mvc.perform(post("/api/v1/auth/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new ForgotPasswordRequest("unknown@nowhere.com"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void forgotPassword_400_whenEmailInvalid() throws Exception {
+        mvc.perform(post("/api/v1/auth/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new ForgotPasswordRequest("not-an-email"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void forgotPassword_400_whenEmailMissing() throws Exception {
+        mvc.perform(post("/api/v1/auth/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    // ── POST /reset-password ──────────────────────────────────────────────────
+
+    @Test
+    void resetPassword_200_onValidTokenAndPassword() throws Exception {
+        Mockito.doNothing().when(authService).resetPassword(any());
+
+        mvc.perform(post("/api/v1/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new ResetPasswordRequest("valid-token", "NewPassword1!"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Password reset successfully"));
+    }
+
+    @Test
+    void resetPassword_400_whenTokenInvalid() throws Exception {
+        Mockito.doThrow(new com.hrapp.common.exception.BusinessException("INVALID_RESET_TOKEN", "Invalid or expired reset token"))
+                .when(authService).resetPassword(any());
+
+        mvc.perform(post("/api/v1/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new ResetPasswordRequest("bad-token", "NewPassword1!"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error").value("INVALID_RESET_TOKEN"));
+    }
+
+    @Test
+    void resetPassword_400_whenPasswordTooShort() throws Exception {
+        mvc.perform(post("/api/v1/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new ResetPasswordRequest("valid-token", "short"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void resetPassword_400_whenTokenMissing() throws Exception {
+        mvc.perform(post("/api/v1/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"password\":\"NewPassword1!\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
     }

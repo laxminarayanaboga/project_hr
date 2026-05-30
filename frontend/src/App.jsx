@@ -4,6 +4,8 @@ import PrivateRoute from './common/PrivateRoute'
 import AppLayout from './layout/AppLayout'
 import LoginPage from './auth/LoginPage'
 import RegisterCompanyPage from './auth/RegisterCompanyPage'
+import ForgotPasswordPage from './auth/ForgotPasswordPage'
+import ResetPasswordPage from './auth/ResetPasswordPage'
 import DashboardPage from './dashboard/DashboardPage'
 import EmployeeListPage from './employees/EmployeeListPage'
 import EmployeeDetailPage from './employees/EmployeeDetailPage'
@@ -16,6 +18,8 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterCompanyPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         <Route element={<PrivateRoute />}>
           <Route element={<AppLayout />}>
