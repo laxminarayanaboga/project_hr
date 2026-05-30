@@ -19,8 +19,8 @@
 |--------|-------|-------|
 | ✅ | [#1](https://github.com/laxminarayanaboga/project_hr/issues/1) | Monorepo structure & project scaffolding |
 | ✅ | [#2](https://github.com/laxminarayanaboga/project_hr/issues/2) | Docker Compose local dev environment |
-| ⏭ | [#3](https://github.com/laxminarayanaboga/project_hr/issues/3) | Terraform AWS infrastructure skeleton *(deferred — personal AWS account)* |
-| ⏭ | [#4](https://github.com/laxminarayanaboga/project_hr/issues/4) | GitHub Actions CI/CD pipeline *(deferred — wire up when staging deploy needed)* |
+| ⏭ | [#3](https://github.com/laxminarayanaboga/project_hr/issues/3) | Terraform AWS infrastructure *(skeleton written, deploy deferred — personal AWS account)* |
+| ⏭ | [#4](https://github.com/laxminarayanaboga/project_hr/issues/4) | GitHub Actions CI/CD *(skeleton written, auto-triggers disabled — re-enable at staging deploy)* |
 
 ### Week 3–4: Authentication
 | Status | Issue | Story |
