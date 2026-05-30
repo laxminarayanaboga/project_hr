@@ -40,10 +40,10 @@
 ### Week 7–9: Employee Management
 | Status | Issue | Story |
 |--------|-------|-------|
-| ⬜ | [#12](https://github.com/laxminarayanaboga/project_hr/issues/12) | Create employee profile |
-| ⬜ | [#13](https://github.com/laxminarayanaboga/project_hr/issues/13) | List & search employees |
-| ⬜ | [#14](https://github.com/laxminarayanaboga/project_hr/issues/14) | View & edit employee profile |
-| ⬜ | [#15](https://github.com/laxminarayanaboga/project_hr/issues/15) | Deactivate employee (soft delete) |
+| ✅ | [#12](https://github.com/laxminarayanaboga/project_hr/issues/12) | Create employee profile |
+| ✅ | [#13](https://github.com/laxminarayanaboga/project_hr/issues/13) | List & search employees |
+| ✅ | [#14](https://github.com/laxminarayanaboga/project_hr/issues/14) | View & edit employee profile |
+| ✅ | [#15](https://github.com/laxminarayanaboga/project_hr/issues/15) | Deactivate employee (soft delete) |
 
 ### Week 10–11: Documents
 | Status | Issue | Story |
