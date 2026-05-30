@@ -102,6 +102,50 @@ test.describe('POST /auth/refresh', () => {
   })
 })
 
+test.describe('POST /auth/logout', () => {
+  test('invalidates refresh token and returns 200', async ({ request }) => {
+    const company = testCompany('logout')
+    const regRes = await request.post(`${API}/auth/register`, { data: company })
+    const { data } = await regRes.json()
+
+    const res = await request.post(`${API}/auth/logout`, {
+      data: { refreshToken: data.refreshToken },
+    })
+
+    expect(res.status()).toBe(200)
+    const body = await res.json()
+    expect(body.success).toBe(true)
+  })
+
+  test('refresh fails after logout', async ({ request }) => {
+    const company = testCompany('logout-then-refresh')
+    const regRes = await request.post(`${API}/auth/register`, { data: company })
+    const { data } = await regRes.json()
+
+    await request.post(`${API}/auth/logout`, {
+      data: { refreshToken: data.refreshToken },
+    })
+
+    const res = await request.post(`${API}/auth/refresh`, {
+      data: { refreshToken: data.refreshToken },
+    })
+
+    expect(res.status()).toBe(401)
+  })
+
+  test('returns 200 for unknown token (idempotent)', async ({ request }) => {
+    const res = await request.post(`${API}/auth/logout`, {
+      data: { refreshToken: 'unknown-token' },
+    })
+    expect(res.status()).toBe(200)
+  })
+
+  test('returns 400 when token missing', async ({ request }) => {
+    const res = await request.post(`${API}/auth/logout`, { data: {} })
+    expect(res.status()).toBe(400)
+  })
+})
+
 test.describe('Protected routes', () => {
   test('returns 401 when no Authorization header', async ({ request }) => {
     const res = await request.get(`${API}/employees`)

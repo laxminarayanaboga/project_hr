@@ -20,7 +20,8 @@ export function AuthProvider({ children }) {
   }, [])
 
   const logout = useCallback(async () => {
-    try { await authApi.logout() } catch {}
+    const refreshToken = localStorage.getItem('refreshToken')
+    try { await authApi.logout(refreshToken) } catch {}
     localStorage.clear()
     setUser(null)
   }, [])
