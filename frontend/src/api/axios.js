@@ -17,10 +17,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config
-    if (error.response?.status === 401 && !original._retry) {
+    const isAuthEndpoint = original?.url?.includes('/auth/')
+    const refreshToken = localStorage.getItem('refreshToken')
+    if (error.response?.status === 401 && !original._retry && !isAuthEndpoint && refreshToken) {
       original._retry = true
       try {
-        const refreshToken = localStorage.getItem('refreshToken')
         const { data } = await axios.post('/api/v1/auth/refresh', { refreshToken })
         localStorage.setItem('accessToken', data.data.accessToken)
         original.headers.Authorization = `Bearer ${data.data.accessToken}`
