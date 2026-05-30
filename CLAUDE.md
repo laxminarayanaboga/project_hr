@@ -102,13 +102,51 @@ Claude reads `docs/PROGRESS.md`, identifies the story, reads the GitHub issue, a
 ---
 
 ### Step 1 — Understand the story
-- Read the GitHub issue: description, acceptance criteria, sub-tasks, testing requirements
+- Read the GitHub issue fully: description, acceptance criteria, sub-tasks, testing requirements
 - Identify what layers are touched: DB migration? backend service/controller? frontend page/component? E2E tests?
-- If anything in the acceptance criteria is ambiguous, ask **one focused question** before branching. Otherwise proceed.
+- Identify anything genuinely unclear before writing a single line of code
 
 ---
 
-### Step 2 — Create the branch
+### Step 2 — Clarification round (ALWAYS before branching)
+
+This is the most important step for async collaboration. The human may not be at the laptop — questions must be asked **all at once, upfront**, so coding can proceed uninterrupted once answered.
+
+**After reading the issue, ask yourself:**
+- Is there a product decision not already covered in CLAUDE.md?
+- Is there an edge case with multiple valid approaches?
+- Is there missing information that would block completion?
+- Is there a dependency on something not yet built?
+
+**If YES to any of the above — post all questions in one message, then wait:**
+```
+**Issue #{n} — {Title} — Questions before I start**
+
+1. {Question} — e.g. options: A) ... B) ...
+2. {Question}
+3. {Question}
+
+I won't branch or write any code until these are answered.
+Take your time — once you reply I'll run the whole story through without interrupting you again.
+```
+
+**If NO questions — skip this step entirely.** Do not ask "any questions?" as a formality. Do not ask "shall I proceed?" Just move to Step 3.
+
+**What is a valid question:**
+- Product/UX decisions not already decided (e.g. "when an employee is deactivated, should pending leave requests be auto-rejected or left pending?")
+- Ambiguous acceptance criteria with multiple valid interpretations
+- Missing data needed to complete the story (e.g. "this references an email template — should I create a new one or reuse the welcome email pattern?")
+- A genuine dependency gap (e.g. "this story links to departments, but department CRUD isn't built yet — should I stub it or build departments first?")
+
+**What is NOT a valid question:**
+- Anything already decided in CLAUDE.md (tech stack, patterns, architecture, deferred items)
+- Standard implementation choices — pick the appropriate pattern from existing code
+- "Is this the right approach?" for things that have an obvious correct answer
+- "Shall I start?" / "Shall I proceed?" — never ask this
+
+---
+
+### Step 3 — Create the branch
 ```bash
 git checkout main
 git pull origin main
@@ -117,22 +155,19 @@ git checkout -b issue/{n}/{short-kebab-description}
 
 ---
 
-### Step 3 — Announce the plan (brief)
-Tell the user in 3–5 bullet points what will be built before writing a single line of code. Example:
+### Step 4 — Announce the plan (brief)
+Tell the user in 3–5 bullet points what will be built. This is informational — do not wait for approval, proceed immediately after posting.
 
 > **Starting Issue #5 — Company Registration**
-> - Flyway migrations V1 (companies) + V2 (users) — already exist, skipping
+> - Flyway migrations V1 + V2 already exist — skipping
 > - `AuthService.register()` — creates company + HR_ADMIN user, returns JWT pair
 > - `AuthController` — POST /api/v1/auth/register with validation
-> - Welcome email logged locally (SES deferred)
-> - Unit tests: AuthServiceTest, AuthControllerTest
-> - E2E: auth.api.spec.ts (register happy path + duplicate/validation errors)
-
-No waiting for approval on this — it's informational. Proceed immediately after posting it.
+> - Welcome email: logged locally (SES deferred until staging)
+> - Tests: AuthServiceTest (Mockito), AuthControllerTest (MockMvc), auth.api.spec.ts (Playwright)
 
 ---
 
-### Step 4 — Build in this order
+### Step 5 — Build in this order (the human is eating cookies — don't interrupt)
 Always build in this sequence within a story (skip layers that aren't relevant):
 
 1. **Flyway migration** — if new tables or columns needed
@@ -145,7 +180,7 @@ Always build in this sequence within a story (skip layers that aren't relevant):
 
 ---
 
-### Step 5 — Test, fix, repeat
+### Step 6 — Test, fix, repeat (still do not interrupt)
 ```bash
 # Backend
 cd backend && mvn test
@@ -165,7 +200,7 @@ If a test reveals a real bug in the implementation — fix the implementation, n
 
 ---
 
-### Step 6 — Pre-PR checklist
+### Step 7 — Pre-PR checklist
 Before raising the PR, verify:
 - [ ] All backend unit tests pass (`mvn test`)
 - [ ] All frontend unit tests pass (`npm test` in `frontend/`)
@@ -179,7 +214,7 @@ Before raising the PR, verify:
 
 ---
 
-### Step 7 — Write the user summary
+### Step 8 — Write the user summary
 Post this to the chat **before** raising the PR. This is what the human reads to understand what was built.
 
 ```
@@ -209,7 +244,7 @@ POST http://localhost:8080/api/v1/{endpoint}
 
 ---
 
-### Step 8 — Raise the PR
+### Step 9 — Raise the PR
 ```bash
 git push origin issue/{n}/{description}
 
@@ -226,7 +261,7 @@ PR body must include:
 
 ---
 
-### Step 9 — Stop
+### Step 10 — Stop
 PR is raised. Post the PR link to the chat. **Do not merge. Do not touch main.**
 Wait for the human to review and merge.
 
