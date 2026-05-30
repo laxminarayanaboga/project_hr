@@ -47,7 +47,7 @@ This file gives Claude Code full context so we can start coding immediately.
 
 The PR gate exists to protect working code from breaking. Docs and config changes don't need it.
 
-### Branch naming (user stories only)
+### Branch naming
 ```
 issue/{number}/{short-kebab-description}
 
@@ -57,6 +57,8 @@ Examples:
   issue/10/department-crud
   issue/12/create-employee-profile
 ```
+
+One story = one branch = one PR. Always branch from the latest `main`.
 
 ### Workflow for a user story
 ```
@@ -100,7 +102,9 @@ The human says one of:
 - "start the next story"
 - "let's do issue #N"
 
-Claude reads `docs/PROGRESS.md`, identifies the story, reads the GitHub issue, and begins. No asking "shall I start?" — just start.
+Claude reads `docs/PROGRESS.md`, identifies the **one story**, reads the GitHub issue, and begins.
+One story at a time. Complete it fully (branch → code → tests → PR) before touching the next.
+No asking "shall I start?" — just start.
 
 ---
 
@@ -514,15 +518,9 @@ Setup complete:
 - 75 GitHub issues across 7 phases, all with testing acceptance criteria
 - Issues #1–#4 closed (setup done / deferred)
 
-**Next stories to build (in order):**
-- #5 — Company registration (POST /auth/register)
-- #6 — User login with JWT (POST /auth/login)
-- #7 — Token refresh & logout
-- #8 — Password reset flow
+**Next story: #5 — Company registration (POST /auth/register)**
 
-**Agreed approach:** batch mode — human gives a batch of stories, Claude asks all
-clarification questions upfront for the whole batch, then builds all stories
-sequentially without interruption, raising a PR per story.
+After that in order: #6 login, #7 token refresh/logout, #8 password reset.
 
 ---
 
