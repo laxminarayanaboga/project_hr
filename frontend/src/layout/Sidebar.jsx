@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Users, Building2, GitBranch, FileText } from 'lucide-react'
+import { LayoutDashboard, Users, Building2, GitBranch, Settings } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import clsx from 'clsx'
 
@@ -8,6 +8,7 @@ const navItems = [
   { to: '/employees', icon: Users, label: 'Employees', roles: ['HR_ADMIN', 'MANAGER'] },
   { to: '/departments', icon: Building2, label: 'Departments', roles: ['HR_ADMIN', 'MANAGER'] },
   { to: '/org-chart', icon: GitBranch, label: 'Org Chart', roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/settings/company', icon: Settings, label: 'Company Settings', roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
 ]
 
 export default function Sidebar() {
