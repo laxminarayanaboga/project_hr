@@ -1,6 +1,7 @@
 package com.hrapp.auth;
 
 import com.hrapp.auth.dto.AuthResponse;
+import com.hrapp.auth.dto.LoginRequest;
 import com.hrapp.auth.dto.RegisterRequest;
 import com.hrapp.auth.dto.UserInfo;
 import com.hrapp.common.exception.BusinessException;
@@ -9,6 +10,7 @@ import com.hrapp.company.CompanyRepository;
 import com.hrapp.user.User;
 import com.hrapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +57,31 @@ public class AuthService {
         userRepository.save(user);
 
         emailService.sendWelcomeEmail(user.getEmail(), company.getName());
+
+        return new AuthResponse(accessToken, refreshToken, UserInfo.from(user));
+    }
+
+    @Transactional
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
+
+        if (!user.isActive()) {
+            throw new BadCredentialsException("Account is disabled");
+        }
+
+        String accessToken = jwtTokenProvider.generateAccessToken(
+                user.getEmail(), user.getId(), user.getCompany().getId(), user.getRole());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
+
+        user.setRefreshToken(refreshToken);
+        user.setRefreshTokenExpiry(Instant.now().plus(7, ChronoUnit.DAYS));
+        user.setLastLogin(Instant.now());
+        userRepository.save(user);
 
         return new AuthResponse(accessToken, refreshToken, UserInfo.from(user));
     }

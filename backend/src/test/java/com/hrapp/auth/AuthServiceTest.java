@@ -1,6 +1,7 @@
 package com.hrapp.auth;
 
 import com.hrapp.auth.dto.AuthResponse;
+import com.hrapp.auth.dto.LoginRequest;
 import com.hrapp.auth.dto.RegisterRequest;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.company.Company;
@@ -15,8 +16,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,5 +137,74 @@ class AuthServiceTest {
         authService.register(new RegisterRequest("My Great Company!", EMAIL, PASSWORD));
 
         verify(companyRepository).save(argThat(c -> c.getSlug().equals("my-great-company")));
+    }
+
+    // ── login() ──────────────────────────────────────────────────────────────
+
+    private User loginUser() {
+        Company company = new Company();
+        company.setId(COMP_ID);
+        company.setName("Acme Ltd");
+
+        User user = new User();
+        user.setId(USER_ID);
+        user.setEmail(EMAIL);
+        user.setPasswordHash("hashed-password");
+        user.setRole("HR_ADMIN");
+        user.setActive(true);
+        user.setCompany(company);
+        return user;
+    }
+
+    @Test
+    void login_happyPath_returnsTokensAndUserInfo() {
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(loginUser()));
+        when(passwordEncoder.matches(PASSWORD, "hashed-password")).thenReturn(true);
+
+        AuthResponse result = authService.login(new LoginRequest(EMAIL, PASSWORD));
+
+        assertThat(result.getAccessToken()).isEqualTo("access-token");
+        assertThat(result.getRefreshToken()).isEqualTo("refresh-token");
+        assertThat(result.getUser().getEmail()).isEqualTo(EMAIL);
+        assertThat(result.getUser().getRole()).isEqualTo("HR_ADMIN");
+        assertThat(result.getUser().getCompanyId()).isEqualTo(COMP_ID);
+    }
+
+    @Test
+    void login_updatesLastLoginAndRefreshToken() {
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(loginUser()));
+        when(passwordEncoder.matches(PASSWORD, "hashed-password")).thenReturn(true);
+
+        authService.login(new LoginRequest(EMAIL, PASSWORD));
+
+        verify(userRepository).save(argThat(u -> u.getLastLogin() != null && u.getRefreshToken() != null));
+    }
+
+    @Test
+    void login_throwsBadCredentials_whenEmailNotFound() {
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.login(new LoginRequest("nobody@nowhere.com", PASSWORD)))
+                .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void login_throwsBadCredentials_whenPasswordWrong() {
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(loginUser()));
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+
+        assertThatThrownBy(() -> authService.login(new LoginRequest(EMAIL, "WrongPassword!")))
+                .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void login_throwsBadCredentials_whenAccountDisabled() {
+        User user = loginUser();
+        user.setActive(false);
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(PASSWORD, "hashed-password")).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.login(new LoginRequest(EMAIL, PASSWORD)))
+                .isInstanceOf(BadCredentialsException.class);
     }
 }
