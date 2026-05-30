@@ -38,13 +38,16 @@ This file gives Claude Code full context so we can start coding immediately.
 > GitHub Pro is not active (personal account). Branch protection cannot be technically enforced on the private repo.
 > This is therefore a **hard convention rule** — Claude must follow it without exception.
 
-### The rule
-- **`main` is always stable.** No direct pushes to main — ever. The only exception was the initial project setup commits.
-- **Every story gets its own branch**, created from the latest `main`.
-- **Claude opens a PR** when the story is complete and all tests pass.
-- **Only the human (you) merges the PR.** Claude never merges.
+### The rule — simple
 
-### Branch naming
+| Type of work | Branch? | PR? |
+|---|---|---|
+| **User story** (feature code, tests) | ✅ Yes — `issue/{n}/{desc}` | ✅ Yes — human merges |
+| **Everything else** (docs, CLAUDE.md, scripts, config, tooling) | ❌ No | ❌ No — push straight to main |
+
+The PR gate exists to protect working code from breaking. Docs and config changes don't need it.
+
+### Branch naming (user stories only)
 ```
 issue/{number}/{short-kebab-description}
 
@@ -55,17 +58,17 @@ Examples:
   issue/12/create-employee-profile
 ```
 
-### Workflow Claude follows for every story
+### Workflow for a user story
 ```
 1. git checkout main && git pull origin main
 2. git checkout -b issue/{n}/{description}
-3. Write code + tests (all tests must pass locally before PR)
+3. Write code + tests (all must pass locally before PR)
 4. git push origin issue/{n}/{description}
 5. gh pr create --title "[Issue #{n}] Title" --body "..."
 6. STOP — wait for human to review and merge
 ```
 
-### PR description template Claude uses
+### PR description template
 ```
 ## Summary
 - What was built (2–3 bullets)
