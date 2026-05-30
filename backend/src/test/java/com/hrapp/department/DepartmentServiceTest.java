@@ -5,6 +5,7 @@ import com.hrapp.common.exception.ResourceNotFoundException;
 import com.hrapp.common.multitenancy.TenantContext;
 import com.hrapp.department.dto.CreateDepartmentRequest;
 import com.hrapp.department.dto.DepartmentResponse;
+import com.hrapp.department.dto.OrgChartNodeDto;
 import com.hrapp.department.dto.UpdateDepartmentRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -193,5 +195,104 @@ class DepartmentServiceTest {
 
         assertThatThrownBy(() -> departmentService.deleteDepartment(DEPT_ID))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    // ── getOrgChart() ─────────────────────────────────────────────────────────
+
+    @Test
+    void getOrgChart_returnsEmpty_whenNoDepartments() {
+        when(departmentRepository.findAllByCompanyIdOrderByName(COMPANY_ID)).thenReturn(List.of());
+        when(departmentRepository.countEmployeesGroupedByDepartment(COMPANY_ID)).thenReturn(List.of());
+
+        List<OrgChartNodeDto> result = departmentService.getOrgChart();
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getOrgChart_returnsFlatRoots_whenNoParents() {
+        Department eng = new Department();
+        eng.setId(UUID.randomUUID());
+        eng.setCompanyId(COMPANY_ID);
+        eng.setName("Engineering");
+
+        Department mkt = new Department();
+        mkt.setId(UUID.randomUUID());
+        mkt.setCompanyId(COMPANY_ID);
+        mkt.setName("Marketing");
+
+        when(departmentRepository.findAllByCompanyIdOrderByName(COMPANY_ID)).thenReturn(List.of(eng, mkt));
+        when(departmentRepository.countEmployeesGroupedByDepartment(COMPANY_ID)).thenReturn(List.of());
+
+        List<OrgChartNodeDto> result = departmentService.getOrgChart();
+
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting(OrgChartNodeDto::name).containsExactlyInAnyOrder("Engineering", "Marketing");
+        assertThat(result).allSatisfy(node -> assertThat(node.children()).isEmpty());
+    }
+
+    @Test
+    void getOrgChart_buildsTree_whenParentChildExist() {
+        UUID parentId = UUID.randomUUID();
+        Department parent = new Department();
+        parent.setId(parentId);
+        parent.setCompanyId(COMPANY_ID);
+        parent.setName("Tech");
+
+        UUID childId = UUID.randomUUID();
+        Department child = new Department();
+        child.setId(childId);
+        child.setCompanyId(COMPANY_ID);
+        child.setName("Frontend");
+        child.setParent(parent);
+
+        when(departmentRepository.findAllByCompanyIdOrderByName(COMPANY_ID)).thenReturn(List.of(parent, child));
+        when(departmentRepository.countEmployeesGroupedByDepartment(COMPANY_ID)).thenReturn(List.of());
+
+        List<OrgChartNodeDto> result = departmentService.getOrgChart();
+
+        assertThat(result).hasSize(1);
+        OrgChartNodeDto root = result.get(0);
+        assertThat(root.name()).isEqualTo("Tech");
+        assertThat(root.children()).hasSize(1);
+        assertThat(root.children().get(0).name()).isEqualTo("Frontend");
+    }
+
+    @Test
+    void getOrgChart_includesEmployeeCount() {
+        UUID deptId = UUID.randomUUID();
+        Department d = new Department();
+        d.setId(deptId);
+        d.setCompanyId(COMPANY_ID);
+        d.setName("Engineering");
+
+        Object[] row = new Object[]{deptId.toString(), 5L};
+        when(departmentRepository.findAllByCompanyIdOrderByName(COMPANY_ID)).thenReturn(List.of(d));
+        when(departmentRepository.countEmployeesGroupedByDepartment(COMPANY_ID)).thenReturn(Collections.singletonList(row));
+
+        List<OrgChartNodeDto> result = departmentService.getOrgChart();
+
+        assertThat(result.get(0).employeeCount()).isEqualTo(5L);
+    }
+
+    @Test
+    void getOrgChart_treatsOrphanedChildAsRoot() {
+        UUID unknownParentId = UUID.randomUUID();
+        Department orphan = new Department();
+        orphan.setId(UUID.randomUUID());
+        orphan.setCompanyId(COMPANY_ID);
+        orphan.setName("Orphan");
+        Department fakeParent = new Department();
+        fakeParent.setId(unknownParentId);
+        fakeParent.setName("Ghost");
+        orphan.setParent(fakeParent);
+
+        when(departmentRepository.findAllByCompanyIdOrderByName(COMPANY_ID)).thenReturn(List.of(orphan));
+        when(departmentRepository.countEmployeesGroupedByDepartment(COMPANY_ID)).thenReturn(List.of());
+
+        List<OrgChartNodeDto> result = departmentService.getOrgChart();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).name()).isEqualTo("Orphan");
     }
 }

@@ -35,7 +35,7 @@
 |--------|-------|-------|
 | ✅ | [#9](https://github.com/laxminarayanaboga/project_hr/issues/9) | Company profile management |
 | ✅ | [#10](https://github.com/laxminarayanaboga/project_hr/issues/10) | Department CRUD |
-| ⬜ | [#11](https://github.com/laxminarayanaboga/project_hr/issues/11) | Org chart tree |
+| ✅ | [#11](https://github.com/laxminarayanaboga/project_hr/issues/11) | Org chart tree |
 
 ### Week 7–9: Employee Management
 | Status | Issue | Story |
