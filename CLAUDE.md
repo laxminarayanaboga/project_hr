@@ -86,6 +86,168 @@ wiring up staging deploy.
 
 ---
 
+## Story Execution Playbook
+
+> This applies to every single user story — all 75 of them.
+> Claude follows this without being told. No need to repeat it.
+
+### Trigger
+The human says one of:
+- "pick up issue #N"
+- "start the next story"
+- "let's do issue #N"
+
+Claude reads `docs/PROGRESS.md`, identifies the story, reads the GitHub issue, and begins. No asking "shall I start?" — just start.
+
+---
+
+### Step 1 — Understand the story
+- Read the GitHub issue: description, acceptance criteria, sub-tasks, testing requirements
+- Identify what layers are touched: DB migration? backend service/controller? frontend page/component? E2E tests?
+- If anything in the acceptance criteria is ambiguous, ask **one focused question** before branching. Otherwise proceed.
+
+---
+
+### Step 2 — Create the branch
+```bash
+git checkout main
+git pull origin main
+git checkout -b issue/{n}/{short-kebab-description}
+```
+
+---
+
+### Step 3 — Announce the plan (brief)
+Tell the user in 3–5 bullet points what will be built before writing a single line of code. Example:
+
+> **Starting Issue #5 — Company Registration**
+> - Flyway migrations V1 (companies) + V2 (users) — already exist, skipping
+> - `AuthService.register()` — creates company + HR_ADMIN user, returns JWT pair
+> - `AuthController` — POST /api/v1/auth/register with validation
+> - Welcome email logged locally (SES deferred)
+> - Unit tests: AuthServiceTest, AuthControllerTest
+> - E2E: auth.api.spec.ts (register happy path + duplicate/validation errors)
+
+No waiting for approval on this — it's informational. Proceed immediately after posting it.
+
+---
+
+### Step 4 — Build in this order
+Always build in this sequence within a story (skip layers that aren't relevant):
+
+1. **Flyway migration** — if new tables or columns needed
+2. **Entity + Repository** — JPA entity, Spring Data repository
+3. **Service layer** — business logic, tenant scoping, exception throwing
+4. **Controller layer** — REST endpoints, request/response DTOs, validation
+5. **Frontend** — API client method, page/component, form validation
+6. **Unit tests** — service test (Mockito), controller test (MockMvc), component test (Vitest)
+7. **E2E tests** — Playwright API spec + UI spec
+
+---
+
+### Step 5 — Test, fix, repeat
+```bash
+# Backend
+cd backend && mvn test
+
+# Frontend
+cd frontend && npm test
+
+# E2E API tests (docker-compose must be up)
+cd e2e && npm run test:api
+
+# E2E UI tests (both docker-compose and npm run dev must be up)
+cd e2e && npm run test:ui
+```
+
+Fix any failures. Re-run. Do not raise a PR until all tests are green.
+If a test reveals a real bug in the implementation — fix the implementation, not the test.
+
+---
+
+### Step 6 — Pre-PR checklist
+Before raising the PR, verify:
+- [ ] All backend unit tests pass (`mvn test`)
+- [ ] All frontend unit tests pass (`npm test` in `frontend/`)
+- [ ] Playwright API tests pass (`npm run test:api` in `e2e/`)
+- [ ] No hardcoded secrets, no TODO/FIXME left behind
+- [ ] Every new DB table has `company_id` and is indexed on it
+- [ ] Every service method scopes queries to `TenantContext.getCurrentCompany()`
+- [ ] Soft deletes used where applicable (employees)
+- [ ] `docs/PROGRESS.md` updated — story marked `🔄 In Progress` (done before coding, `✅ Done` after PR is raised)
+- [ ] Sub-tasks in the GitHub issue ticked off
+
+---
+
+### Step 7 — Write the user summary
+Post this to the chat **before** raising the PR. This is what the human reads to understand what was built.
+
+```
+## Issue #{n} — {Story Title} — Complete
+
+### What was built
+- {bullet: key backend thing}
+- {bullet: key frontend thing}
+- {bullet: tests written}
+
+### How to test locally
+1. docker-compose up
+2. cd frontend && npm run dev
+3. {specific action: e.g. "go to /register, fill in the form, submit"}
+4. {what to expect: e.g. "you should be redirected to /dashboard"}
+
+### API (quick test with curl or Postman)
+POST http://localhost:8080/api/v1/{endpoint}
+{example request body}
+
+### Notable decisions
+- {anything non-obvious: a trade-off made, a constraint hit, something deferred}
+
+### PR
+{link — posted right after this summary}
+```
+
+---
+
+### Step 8 — Raise the PR
+```bash
+git push origin issue/{n}/{description}
+
+gh pr create \
+  --title "[Issue #{n}] {Story title}" \
+  --body "..." \
+  --base main
+```
+
+PR body must include:
+- Summary bullets (same as user summary above)
+- How to test locally
+- `Closes #{n}` so GitHub auto-closes the issue on merge
+
+---
+
+### Step 9 — Stop
+PR is raised. Post the PR link to the chat. **Do not merge. Do not touch main.**
+Wait for the human to review and merge.
+
+Once merged, update `docs/PROGRESS.md` — mark the story `✅ Done`.
+
+---
+
+### What to do if blocked
+If something genuinely can't be resolved without a human decision (e.g. a product ambiguity, a dependency on something not yet built), post a clear blocker message:
+
+```
+**Blocked on Issue #{n}**
+Reason: {one sentence}
+Decision needed: {specific question with 2–3 options if possible}
+Everything else is done — this is the only thing holding up the PR.
+```
+
+Do not raise a half-finished PR. Either finish it or describe the blocker clearly.
+
+---
+
 ## Monorepo Structure
 
 ```
