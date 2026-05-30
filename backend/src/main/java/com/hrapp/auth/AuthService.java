@@ -1,9 +1,11 @@
 package com.hrapp.auth;
 
 import com.hrapp.auth.dto.AuthResponse;
+import com.hrapp.auth.dto.ForgotPasswordRequest;
 import com.hrapp.auth.dto.LoginRequest;
 import com.hrapp.auth.dto.RefreshResponse;
 import com.hrapp.auth.dto.RegisterRequest;
+import com.hrapp.auth.dto.ResetPasswordRequest;
 import com.hrapp.auth.dto.UserInfo;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.company.Company;
@@ -108,6 +110,33 @@ public class AuthService {
             user.setRefreshTokenExpiry(null);
             userRepository.save(user);
         });
+    }
+
+    @Transactional
+    public void forgotPassword(ForgotPasswordRequest request) {
+        userRepository.findByEmail(request.getEmail()).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            user.setResetToken(token);
+            user.setResetTokenExpiry(Instant.now().plus(1, ChronoUnit.HOURS));
+            userRepository.save(user);
+            emailService.sendPasswordResetEmail(user.getEmail(), token);
+        });
+        // Always returns success to prevent email enumeration
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByResetToken(request.getToken())
+                .orElseThrow(() -> new BusinessException("INVALID_RESET_TOKEN", "Invalid or expired reset token"));
+
+        if (user.getResetTokenExpiry() == null || Instant.now().isAfter(user.getResetTokenExpiry())) {
+            throw new BusinessException("INVALID_RESET_TOKEN", "Invalid or expired reset token");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
     }
 
     private String generateUniqueSlug(String companyName) {

@@ -1,9 +1,11 @@
 package com.hrapp.auth;
 
 import com.hrapp.auth.dto.AuthResponse;
+import com.hrapp.auth.dto.ForgotPasswordRequest;
 import com.hrapp.auth.dto.LoginRequest;
 import com.hrapp.auth.dto.RefreshResponse;
 import com.hrapp.auth.dto.RegisterRequest;
+import com.hrapp.auth.dto.ResetPasswordRequest;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.company.Company;
 import com.hrapp.company.CompanyRepository;
@@ -273,5 +275,93 @@ class AuthServiceTest {
         authService.logout("unknown-token");
 
         verify(userRepository, never()).save(any());
+    }
+
+    // ── forgotPassword() ──────────────────────────────────────────────────────
+
+    private User resetUser() {
+        Company company = new Company();
+        company.setId(COMP_ID);
+        company.setName("Acme Ltd");
+
+        User user = new User();
+        user.setId(USER_ID);
+        user.setEmail(EMAIL);
+        user.setRole("HR_ADMIN");
+        user.setCompany(company);
+        user.setActive(true);
+        return user;
+    }
+
+    @Test
+    void forgotPassword_setsTokenAndSendsEmail_whenEmailExists() {
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(resetUser()));
+
+        authService.forgotPassword(new ForgotPasswordRequest(EMAIL));
+
+        verify(userRepository).save(argThat(u ->
+                u.getResetToken() != null && u.getResetTokenExpiry() != null));
+        verify(emailService).sendPasswordResetEmail(eq(EMAIL), anyString());
+    }
+
+    @Test
+    void forgotPassword_doesNothing_whenEmailNotFound() {
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        authService.forgotPassword(new ForgotPasswordRequest("nobody@nowhere.com"));
+
+        verify(userRepository, never()).save(any());
+        verify(emailService, never()).sendPasswordResetEmail(any(), any());
+    }
+
+    // ── resetPassword() ───────────────────────────────────────────────────────
+
+    @Test
+    void resetPassword_updatesHashAndClearsToken_whenTokenValid() {
+        User user = resetUser();
+        user.setResetToken("valid-token");
+        user.setResetTokenExpiry(Instant.now().plusSeconds(3600));
+        when(userRepository.findByResetToken("valid-token")).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode("NewPassword1!")).thenReturn("new-hashed");
+
+        authService.resetPassword(new ResetPasswordRequest("valid-token", "NewPassword1!"));
+
+        verify(userRepository).save(argThat(u ->
+                u.getPasswordHash().equals("new-hashed") &&
+                u.getResetToken() == null &&
+                u.getResetTokenExpiry() == null));
+    }
+
+    @Test
+    void resetPassword_throwsBusinessException_whenTokenNotFound() {
+        when(userRepository.findByResetToken(anyString())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.resetPassword(new ResetPasswordRequest("bad-token", "NewPassword1!")))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode").isEqualTo("INVALID_RESET_TOKEN");
+    }
+
+    @Test
+    void resetPassword_throwsBusinessException_whenTokenExpired() {
+        User user = resetUser();
+        user.setResetToken("expired-token");
+        user.setResetTokenExpiry(Instant.now().minusSeconds(1));
+        when(userRepository.findByResetToken("expired-token")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authService.resetPassword(new ResetPasswordRequest("expired-token", "NewPassword1!")))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode").isEqualTo("INVALID_RESET_TOKEN");
+    }
+
+    @Test
+    void resetPassword_throwsBusinessException_whenTokenExpiryNull() {
+        User user = resetUser();
+        user.setResetToken("null-expiry-token");
+        user.setResetTokenExpiry(null);
+        when(userRepository.findByResetToken("null-expiry-token")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authService.resetPassword(new ResetPasswordRequest("null-expiry-token", "NewPassword1!")))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode").isEqualTo("INVALID_RESET_TOKEN");
     }
 }

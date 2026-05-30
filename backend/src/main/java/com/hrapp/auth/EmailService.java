@@ -13,4 +13,9 @@ public class EmailService {
         // SES deferred until staging deploy — log locally for now
         log.info("Welcome email queued for {} (company: {})", email, companyName);
     }
+
+    public void sendPasswordResetEmail(String email, String resetToken) {
+        // SES deferred until staging deploy — log reset link locally
+        log.info("Password reset email queued for {} — token: {}", email, resetToken);
+    }
 }

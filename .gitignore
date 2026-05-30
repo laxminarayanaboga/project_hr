@@ -3,53 +3,6 @@
 .AppleDouble
 .LSOverride
 
-# Java / Maven / Gradle
-target/
-build/
-.gradle/
-*.class
-*.jar
-*.war
-*.ear
-.mvn/
-mvnw
-!.mvn/wrapper/maven-wrapper.jar
-
-# Spring Boot
-*.log
-logs/
-
-# Node / React
-node_modules/
-dist/
-.next/
-.nuxt/
-frontend/.env.local
-frontend/.env.production
-
-# Environment files (NEVER commit real secrets)
-.env
-.env.local
-.env.production
-*.env
-
-# Terraform
-infrastructure/.terraform/
-infrastructure/*.tfstate
-infrastructure/*.tfstate.backup
-infrastructure/terraform.tfvars
-infrastructure/.terraform.lock.hcl
-infrastructure/crash.log
-
-# React Native
-mobile/node_modules/
-mobile/.gradle/
-mobile/android/build/
-mobile/ios/build/
-mobile/ios/Pods/
-mobile/*.jks
-mobile/*.keystore
-
 # IDEs
 .idea/
 *.iml
@@ -57,7 +10,11 @@ mobile/*.keystore
 *.swp
 *.swo
 
+# Environment files (NEVER commit real secrets)
+.env
+.env.local
+.env.production
+*.env
+
 # AWS
 .aws/
-e2e/playwright-report/index.html
-e2e/test-results/.last-run.json
