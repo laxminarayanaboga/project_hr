@@ -3,8 +3,10 @@
 .AppleDouble
 .LSOverride
 
-# Java / Maven
+# Java / Maven / Gradle
 target/
+build/
+.gradle/
 *.class
 *.jar
 *.war
@@ -57,3 +59,5 @@ mobile/*.keystore
 
 # AWS
 .aws/
+e2e/playwright-report/index.html
+e2e/test-results/.last-run.json

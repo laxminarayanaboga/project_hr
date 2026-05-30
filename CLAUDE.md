@@ -182,6 +182,12 @@ Always build in this sequence within a story (skip layers that aren't relevant):
 6. **Unit tests** — service test (Mockito), controller test (MockMvc), component test (Vitest)
 7. **E2E tests** — Playwright API spec + UI spec
 
+**Tick the GitHub issue checkbox as each subtask is completed** — do not batch-tick at the end.
+Use `gh issue edit` to update the issue body, replacing `- [ ]` with `- [x]` for the completed item:
+```bash
+gh issue edit {n} --body "$(gh issue view {n} --json body -q .body | sed 's/- \[ \] SUBTASK_TEXT/- [x] SUBTASK_TEXT/')"
+```
+
 ---
 
 ### Step 6 — Test, fix, repeat
@@ -231,7 +237,7 @@ Before raising the PR, verify:
 - [ ] Every service method scopes queries to `TenantContext.getCurrentCompany()`
 - [ ] Soft deletes used where applicable (employees)
 - [ ] `docs/PROGRESS.md` updated — story marked `🔄 In Progress` before coding, `✅ Done` after PR raised
-- [ ] Sub-tasks in the GitHub issue ticked off
+- [ ] All GitHub issue sub-task checkboxes are ticked (should already be done progressively — this is a final check)
 
 ---
 
@@ -455,6 +461,7 @@ Local dev runs via `docker-compose up` — no AWS needed for development.
 4. **Documents never served directly from S3** — always pre-signed URLs (15-min expiry)
 5. **Soft delete employees** — set `employment_status = TERMINATED`, never hard delete
 6. **No custom_fields table** — model domain concepts as real columns
+7. **Never use `cat`/`echo` heredocs to create or write files** — always use the `Write` tool (new files) or `Edit` tool (existing files). Shell file-creation patterns (`cat > file << 'EOF'`) bypass the proper tooling and trigger unnecessary permission prompts.
 
 ---
 
@@ -466,7 +473,7 @@ A user story is **not done** until all of these pass:
 - **Service layer**: JUnit 5 + Mockito — happy path, edge cases, error paths
 - **Controller layer**: `@WebMvcTest` + MockMvc — all endpoints, auth enforcement, validation
 - **Repository**: `@DataJpaTest` — custom queries and Specifications only (not for generated methods)
-- Run with: `mvn test`
+- Run with: `./gradlew test`
 
 ### Frontend (per component/page)
 - **Component tests**: Vitest + React Testing Library — renders, user events, error states
