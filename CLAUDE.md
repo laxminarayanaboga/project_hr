@@ -501,12 +501,28 @@ A user story is **not done** until all of these pass:
 
 ## Where We Are Now
 
-Monorepo scaffolded. Phase 1 coding in progress.
+**Phase 1, Week 3–4 — Auth block is next.**
 
-- `docker-compose up` → PostgreSQL + Spring Boot running locally
-- `cd frontend && npm run dev` → React app at http://localhost:5173
-- `cd e2e && npm test` → Playwright tests (API + UI)
-- All 75 GitHub issues created across 7 phases with testing requirements on each
+Setup complete:
+- Monorepo scaffolded (backend, frontend, mobile, infrastructure, e2e, scripts, docs)
+- Docker Compose ready — `docker-compose up` starts PostgreSQL 17 + Spring Boot
+- Flyway migrations V1–V5 written (companies, users, departments, employees, documents)
+- Spring Security + JWT filter + TenantContext wired (skeleton, not yet connected to real auth endpoints)
+- React app scaffolded with routing, auth context, axios interceptor, all page shells
+- Playwright E2E configured (API + UI test projects)
+- Vitest + React Testing Library configured
+- 75 GitHub issues across 7 phases, all with testing acceptance criteria
+- Issues #1–#4 closed (setup done / deferred)
+
+**Next stories to build (in order):**
+- #5 — Company registration (POST /auth/register)
+- #6 — User login with JWT (POST /auth/login)
+- #7 — Token refresh & logout
+- #8 — Password reset flow
+
+**Agreed approach:** batch mode — human gives a batch of stories, Claude asks all
+clarification questions upfront for the whole batch, then builds all stories
+sequentially without interruption, raising a PR per story.
 
 ---
 
