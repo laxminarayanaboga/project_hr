@@ -37,27 +37,27 @@ test.describe('Departments Page', () => {
     await page.getByPlaceholder(/optional/i).fill('Product management')
     await page.getByRole('button', { name: /create department/i }).click()
 
-    await expect(page.getByText('Product')).toBeVisible()
+    await expect(page.locator('.font-medium', { hasText: 'Product' })).toBeVisible()
     await expect(page.getByText('Product management')).toBeVisible()
   })
 
   test('HR_ADMIN can edit a department', async ({ page, request }) => {
-    const company = await loginAs(page, request, 'ui-dept-edit')
+    await loginAs(page, request, 'ui-dept-edit')
 
     await page.goto('/departments')
     await page.getByRole('button', { name: /add department/i }).click()
     await page.getByPlaceholder(/e\.g\. engineering/i).fill('Engineering')
     await page.getByRole('button', { name: /create department/i }).click()
-    await expect(page.getByText('Engineering')).toBeVisible()
+    await expect(page.locator('.font-medium', { hasText: 'Engineering' })).toBeVisible()
 
     await page.getByTitle('Edit').first().click()
-    await expect(page.getByDisplayValue('Engineering')).toBeVisible()
+    await expect(page.getByPlaceholder(/e\.g\. engineering/i)).toHaveValue('Engineering')
 
-    await page.getByDisplayValue('Engineering').fill('R&D')
+    await page.getByPlaceholder(/e\.g\. engineering/i).fill('R&D')
     await page.getByRole('button', { name: /save changes/i }).click()
 
-    await expect(page.getByText('R&D')).toBeVisible()
-    await expect(page.queryByText('Engineering')).toBeNull()
+    await expect(page.locator('.font-medium', { hasText: 'R&D' })).toBeVisible()
+    await expect(page.locator('.font-medium', { hasText: 'Engineering' })).not.toBeVisible()
   })
 
   test('HR_ADMIN can delete a department', async ({ page, request }) => {
@@ -67,11 +67,11 @@ test.describe('Departments Page', () => {
     await page.getByRole('button', { name: /add department/i }).click()
     await page.getByPlaceholder(/e\.g\. engineering/i).fill('Temp Dept')
     await page.getByRole('button', { name: /create department/i }).click()
-    await expect(page.getByText('Temp Dept')).toBeVisible()
+    await expect(page.locator('.font-medium', { hasText: 'Temp Dept' })).toBeVisible()
 
     page.once('dialog', dialog => dialog.accept())
     await page.getByTitle('Delete').first().click()
 
-    await expect(page.getByText('Temp Dept')).not.toBeVisible()
+    await expect(page.locator('.font-medium', { hasText: 'Temp Dept' })).not.toBeVisible()
   })
 })
