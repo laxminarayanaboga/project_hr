@@ -16,12 +16,27 @@ services:
       timeout: 5s
       retries: 5
 
+  flyway:
+    image: flyway/flyway:11-alpine
+    container_name: hrapp-flyway
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/hrapp
+      FLYWAY_USER: hrapp
+      FLYWAY_PASSWORD: hrapp_dev
+    volumes:
+      - ./backend/src/main/resources/db/migration:/flyway/sql
+    command: migrate
+    restart: "no"
+
   backend:
     build: ./backend
     container_name: hrapp-backend
     depends_on:
-      db:
-        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/hrapp
@@ -32,9 +47,6 @@ services:
       S3_DOCUMENTS_BUCKET: hrapp-documents-dev
       SES_FROM_ADDRESS: noreply@hrapp.dev
       CORS_ALLOWED_ORIGINS: http://localhost:5173
-      SPRING_FLYWAY_URL: jdbc:postgresql://db:5432/hrapp
-      SPRING_FLYWAY_USER: hrapp
-      SPRING_FLYWAY_PASSWORD: hrapp_dev
     ports:
       - "8080:8080"
     healthcheck:

@@ -11,6 +11,7 @@ import EmployeeListPage from './employees/EmployeeListPage'
 import EmployeeDetailPage from './employees/EmployeeDetailPage'
 import DepartmentListPage from './departments/DepartmentListPage'
 import OrgChartPage from './departments/OrgChartPage'
+import CompanySettingsPage from './company/CompanySettingsPage'
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/employees/:id" element={<EmployeeDetailPage />} />
             <Route path="/departments" element={<DepartmentListPage />} />
             <Route path="/org-chart" element={<OrgChartPage />} />
+            <Route path="/settings/company" element={<CompanySettingsPage />} />
           </Route>
         </Route>
 

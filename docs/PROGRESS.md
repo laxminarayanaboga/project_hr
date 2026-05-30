@@ -33,7 +33,7 @@
 ### Week 5–6: Company Profile + Departments
 | Status | Issue | Story |
 |--------|-------|-------|
-| ⬜ | [#9](https://github.com/laxminarayanaboga/project_hr/issues/9) | Company profile management |
+| ✅ | [#9](https://github.com/laxminarayanaboga/project_hr/issues/9) | Company profile management |
 | ⬜ | [#10](https://github.com/laxminarayanaboga/project_hr/issues/10) | Department CRUD |
 | ⬜ | [#11](https://github.com/laxminarayanaboga/project_hr/issues/11) | Org chart tree |
 
