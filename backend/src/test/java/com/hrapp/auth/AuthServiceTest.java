@@ -2,6 +2,7 @@ package com.hrapp.auth;
 
 import com.hrapp.auth.dto.AuthResponse;
 import com.hrapp.auth.dto.LoginRequest;
+import com.hrapp.auth.dto.RefreshResponse;
 import com.hrapp.auth.dto.RegisterRequest;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.company.Company;
@@ -19,6 +20,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -206,5 +208,70 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.login(new LoginRequest(EMAIL, PASSWORD)))
                 .isInstanceOf(BadCredentialsException.class);
+    }
+
+    // ── refresh() ─────────────────────────────────────────────────────────────
+
+    private User refreshUser() {
+        Company company = new Company();
+        company.setId(COMP_ID);
+        company.setName("Acme Ltd");
+
+        User user = new User();
+        user.setId(USER_ID);
+        user.setEmail(EMAIL);
+        user.setRole("HR_ADMIN");
+        user.setCompany(company);
+        user.setRefreshToken("valid-refresh-token");
+        user.setRefreshTokenExpiry(Instant.now().plusSeconds(3600));
+        return user;
+    }
+
+    @Test
+    void refresh_happyPath_returnsNewAccessToken() {
+        when(userRepository.findByRefreshToken("valid-refresh-token")).thenReturn(Optional.of(refreshUser()));
+
+        RefreshResponse result = authService.refresh("valid-refresh-token");
+
+        assertThat(result.getAccessToken()).isEqualTo("access-token");
+    }
+
+    @Test
+    void refresh_throwsBadCredentials_whenTokenNotFound() {
+        when(userRepository.findByRefreshToken(anyString())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.refresh("unknown-token"))
+                .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void refresh_throwsBadCredentials_whenTokenExpired() {
+        User user = refreshUser();
+        user.setRefreshTokenExpiry(Instant.now().minusSeconds(1));
+        when(userRepository.findByRefreshToken("expired-token")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authService.refresh("expired-token"))
+                .isInstanceOf(BadCredentialsException.class);
+    }
+
+    // ── logout() ──────────────────────────────────────────────────────────────
+
+    @Test
+    void logout_clearsRefreshToken_whenTokenFound() {
+        User user = refreshUser();
+        when(userRepository.findByRefreshToken("valid-refresh-token")).thenReturn(Optional.of(user));
+
+        authService.logout("valid-refresh-token");
+
+        verify(userRepository).save(argThat(u -> u.getRefreshToken() == null && u.getRefreshTokenExpiry() == null));
+    }
+
+    @Test
+    void logout_doesNothing_whenTokenNotFound() {
+        when(userRepository.findByRefreshToken(anyString())).thenReturn(Optional.empty());
+
+        authService.logout("unknown-token");
+
+        verify(userRepository, never()).save(any());
     }
 }

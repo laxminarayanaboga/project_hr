@@ -3,11 +3,14 @@ package com.hrapp.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrapp.auth.dto.AuthResponse;
 import com.hrapp.auth.dto.LoginRequest;
+import com.hrapp.auth.dto.RefreshRequest;
+import com.hrapp.auth.dto.RefreshResponse;
 import com.hrapp.auth.dto.RegisterRequest;
 import com.hrapp.auth.dto.UserInfo;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.common.exception.GlobalExceptionHandler;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.mockito.Mockito;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +24,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -178,6 +182,75 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
                         new LoginRequest("not-an-email", "Password123!"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    // ── POST /refresh ─────────────────────────────────────────────────────────
+
+    @Test
+    void refresh_200_onValidToken() throws Exception {
+        when(authService.refresh("valid-token")).thenReturn(new RefreshResponse("new-access-token"));
+
+        mvc.perform(post("/api/v1/auth/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new RefreshRequest("valid-token"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.accessToken").value("new-access-token"));
+    }
+
+    @Test
+    void refresh_401_onInvalidToken() throws Exception {
+        when(authService.refresh(anyString())).thenThrow(new BadCredentialsException("Invalid refresh token"));
+
+        mvc.perform(post("/api/v1/auth/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new RefreshRequest("bad-token"))))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error").value("INVALID_CREDENTIALS"));
+    }
+
+    @Test
+    void refresh_400_whenTokenMissing() throws Exception {
+        mvc.perform(post("/api/v1/auth/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"refreshToken\":\"\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    // ── POST /logout ──────────────────────────────────────────────────────────
+
+    @Test
+    void logout_200_onValidToken() throws Exception {
+        Mockito.doNothing().when(authService).logout("valid-token");
+
+        mvc.perform(post("/api/v1/auth/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new RefreshRequest("valid-token"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Logged out successfully"));
+    }
+
+    @Test
+    void logout_200_whenTokenNotFound() throws Exception {
+        Mockito.doNothing().when(authService).logout(anyString());
+
+        mvc.perform(post("/api/v1/auth/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new RefreshRequest("unknown-token"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void logout_400_whenTokenMissing() throws Exception {
+        mvc.perform(post("/api/v1/auth/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"refreshToken\":\"\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
     }

@@ -2,6 +2,7 @@ package com.hrapp.auth;
 
 import com.hrapp.auth.dto.AuthResponse;
 import com.hrapp.auth.dto.LoginRequest;
+import com.hrapp.auth.dto.RefreshResponse;
 import com.hrapp.auth.dto.RegisterRequest;
 import com.hrapp.auth.dto.UserInfo;
 import com.hrapp.common.exception.BusinessException;
@@ -84,6 +85,29 @@ public class AuthService {
         userRepository.save(user);
 
         return new AuthResponse(accessToken, refreshToken, UserInfo.from(user));
+    }
+
+    @Transactional
+    public RefreshResponse refresh(String refreshToken) {
+        User user = userRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
+
+        if (user.getRefreshTokenExpiry() == null || Instant.now().isAfter(user.getRefreshTokenExpiry())) {
+            throw new BadCredentialsException("Refresh token expired");
+        }
+
+        String accessToken = jwtTokenProvider.generateAccessToken(
+                user.getEmail(), user.getId(), user.getCompany().getId(), user.getRole());
+        return new RefreshResponse(accessToken);
+    }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        userRepository.findByRefreshToken(refreshToken).ifPresent(user -> {
+            user.setRefreshToken(null);
+            user.setRefreshTokenExpiry(null);
+            userRepository.save(user);
+        });
     }
 
     private String generateUniqueSlug(String companyName) {
