@@ -33,6 +33,59 @@ This file gives Claude Code full context so we can start coding immediately.
 
 ---
 
+## Branch Strategy — Mandatory
+
+> GitHub Pro is not active (personal account). Branch protection cannot be technically enforced on the private repo.
+> This is therefore a **hard convention rule** — Claude must follow it without exception.
+
+### The rule
+- **`main` is always stable.** No direct pushes to main — ever. The only exception was the initial project setup commits.
+- **Every story gets its own branch**, created from the latest `main`.
+- **Claude opens a PR** when the story is complete and all tests pass.
+- **Only the human (you) merges the PR.** Claude never merges.
+
+### Branch naming
+```
+issue/{number}/{short-kebab-description}
+
+Examples:
+  issue/5/company-registration
+  issue/6/user-login-jwt
+  issue/10/department-crud
+  issue/12/create-employee-profile
+```
+
+### Workflow Claude follows for every story
+```
+1. git checkout main && git pull origin main
+2. git checkout -b issue/{n}/{description}
+3. Write code + tests (all tests must pass locally before PR)
+4. git push origin issue/{n}/{description}
+5. gh pr create --title "[Issue #{n}] Title" --body "..."
+6. STOP — wait for human to review and merge
+```
+
+### PR description template Claude uses
+```
+## Summary
+- What was built (2–3 bullets)
+
+## Testing
+- How to verify locally (docker-compose up, then...)
+- Unit tests: mvn test or npm test
+- E2E tests (if applicable): cd e2e && npm run test:api
+
+## Related
+Closes #{issue-number}
+```
+
+### GitHub Actions
+Auto-triggers are **disabled** on both workflows (personal account — avoid billing).
+Workflows exist as skeletons only. Re-enable `push`/`pull_request` triggers when
+wiring up staging deploy.
+
+---
+
 ## Monorepo Structure
 
 ```

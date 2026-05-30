@@ -1,12 +1,9 @@
 name: Frontend CI/CD
 
 on:
-  push:
-    branches: [main]
-    paths: [frontend/**]
-  pull_request:
-    branches: [main]
-    paths: [frontend/**]
+  workflow_dispatch:
+    # Auto-triggers disabled — personal account, minimise billing.
+    # Enable push/pull_request triggers when ready to wire up staging deploy.
 
 env:
   AWS_REGION: eu-west-2
