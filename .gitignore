@@ -3,8 +3,10 @@
 .AppleDouble
 .LSOverride
 
-# Java / Maven
+# Java / Maven / Gradle
 target/
+build/
+.gradle/
 *.class
 *.jar
 *.war
