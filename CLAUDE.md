@@ -102,13 +102,48 @@ Claude reads `docs/PROGRESS.md`, identifies the story, reads the GitHub issue, a
 ---
 
 ### Step 1 — Understand the story
-- Read the GitHub issue: description, acceptance criteria, sub-tasks, testing requirements
+- Read the GitHub issue fully: description, acceptance criteria, sub-tasks, testing requirements
 - Identify what layers are touched: DB migration? backend service/controller? frontend page/component? E2E tests?
-- If anything in the acceptance criteria is ambiguous, ask **one focused question** before branching. Otherwise proceed.
+- Identify anything genuinely unclear before writing a single line of code
 
 ---
 
-### Step 2 — Create the branch
+### Step 2 — Clarification round (ALWAYS before branching)
+
+The human may not be at the keyboard — questions must be asked **all at once, upfront**, so coding can run uninterrupted once answered.
+
+**After reading the issue, ask yourself:**
+- Is there a product decision not already covered in CLAUDE.md?
+- Is there an edge case with multiple valid approaches?
+- Is there missing information that would block completion?
+- Is there a dependency on something not yet built?
+
+**If YES to any — post all questions in one numbered list, then wait:**
+```
+**Issue #{n} — {Title} — Questions before I start**
+
+1. {Question} — options: A) ... B) ...
+2. {Question}
+3. {Question}
+
+I won't branch or write any code until these are answered.
+```
+
+**If NO questions — skip this step entirely.** Do not ask "any questions?" as a formality. Do not ask "shall I proceed?" Just move to Step 3.
+
+**What counts as a valid question:**
+- Product/UX decisions not already decided (e.g. "when an employee is deactivated, should pending leave requests be auto-rejected or left pending?")
+- Ambiguous acceptance criteria with multiple valid interpretations
+- A genuine dependency gap (e.g. "this story links to departments, but department CRUD isn't built yet — should I stub it or build departments first?")
+
+**What does NOT count:**
+- Anything already decided in CLAUDE.md (tech stack, patterns, deferred items)
+- Standard implementation choices — pick the appropriate pattern from existing code
+- "Shall I proceed?" / "Is this okay?" — never ask these
+
+---
+
+### Step 3 — Create the branch
 ```bash
 git checkout main
 git pull origin main
@@ -117,22 +152,19 @@ git checkout -b issue/{n}/{short-kebab-description}
 
 ---
 
-### Step 3 — Announce the plan (brief)
-Tell the user in 3–5 bullet points what will be built before writing a single line of code. Example:
+### Step 4 — Announce the plan (brief)
+Tell the user in 3–5 bullet points what will be built. Informational only — do not wait for approval, proceed immediately.
 
 > **Starting Issue #5 — Company Registration**
-> - Flyway migrations V1 (companies) + V2 (users) — already exist, skipping
+> - Flyway migrations V1 + V2 already exist — skipping
 > - `AuthService.register()` — creates company + HR_ADMIN user, returns JWT pair
 > - `AuthController` — POST /api/v1/auth/register with validation
-> - Welcome email logged locally (SES deferred)
-> - Unit tests: AuthServiceTest, AuthControllerTest
-> - E2E: auth.api.spec.ts (register happy path + duplicate/validation errors)
-
-No waiting for approval on this — it's informational. Proceed immediately after posting it.
+> - Welcome email: logged locally (SES deferred until staging)
+> - Tests: AuthServiceTest (Mockito), AuthControllerTest (MockMvc), auth.api.spec.ts (Playwright)
 
 ---
 
-### Step 4 — Build in this order
+### Step 5 — Build in this order
 Always build in this sequence within a story (skip layers that aren't relevant):
 
 1. **Flyway migration** — if new tables or columns needed
@@ -145,7 +177,8 @@ Always build in this sequence within a story (skip layers that aren't relevant):
 
 ---
 
-### Step 5 — Test, fix, repeat
+### Step 6 — Test, fix, repeat
+
 ```bash
 # Backend
 cd backend && mvn test
@@ -160,12 +193,28 @@ cd e2e && npm run test:api
 cd e2e && npm run test:ui
 ```
 
-Fix any failures. Re-run. Do not raise a PR until all tests are green.
-If a test reveals a real bug in the implementation — fix the implementation, not the test.
+Fix failures. Re-run. Do not raise a PR until all tests are green.
+
+**When tests fail — diagnose first, then fix correctly:**
+
+| Situation | Correct action |
+|---|---|
+| Test fails because implementation logic is wrong | Fix the implementation |
+| Test asserts the wrong thing (wrong status code, wrong field name) | Fix the test |
+| Test is genuinely flaky (timing, async) | Fix the test setup |
+| Test is no longer relevant after a design change | Delete the test AND document why |
+
+**Never do this:**
+- ❌ Delete a failing test just to make the suite go green
+- ❌ Add special-case `if (test)` logic to production code to satisfy a test
+- ❌ Change an expected value in a test to match wrong output without understanding why
+- ❌ `@Disabled` / `test.skip` a failing test without a comment explaining the plan
+
+If tests are failing and the cause is genuinely unclear after honest investigation — raise a blocker (see below), not a workaround.
 
 ---
 
-### Step 6 — Pre-PR checklist
+### Step 7 — Pre-PR checklist
 Before raising the PR, verify:
 - [ ] All backend unit tests pass (`mvn test`)
 - [ ] All frontend unit tests pass (`npm test` in `frontend/`)
@@ -174,13 +223,13 @@ Before raising the PR, verify:
 - [ ] Every new DB table has `company_id` and is indexed on it
 - [ ] Every service method scopes queries to `TenantContext.getCurrentCompany()`
 - [ ] Soft deletes used where applicable (employees)
-- [ ] `docs/PROGRESS.md` updated — story marked `🔄 In Progress` (done before coding, `✅ Done` after PR is raised)
+- [ ] `docs/PROGRESS.md` updated — story marked `🔄 In Progress` before coding, `✅ Done` after PR raised
 - [ ] Sub-tasks in the GitHub issue ticked off
 
 ---
 
-### Step 7 — Write the user summary
-Post this to the chat **before** raising the PR. This is what the human reads to understand what was built.
+### Step 8 — Write the user summary
+Post this to the chat **before** raising the PR.
 
 ```
 ## Issue #{n} — {Story Title} — Complete
@@ -193,23 +242,23 @@ Post this to the chat **before** raising the PR. This is what the human reads to
 ### How to test locally
 1. docker-compose up
 2. cd frontend && npm run dev
-3. {specific action: e.g. "go to /register, fill in the form, submit"}
-4. {what to expect: e.g. "you should be redirected to /dashboard"}
+3. {specific action — e.g. "go to /register, fill the form, submit"}
+4. {what to expect — e.g. "redirected to /dashboard"}
 
-### API (quick test with curl or Postman)
+### API
 POST http://localhost:8080/api/v1/{endpoint}
 {example request body}
 
 ### Notable decisions
-- {anything non-obvious: a trade-off made, a constraint hit, something deferred}
+- {anything non-obvious: trade-off made, constraint hit, something deferred}
 
 ### PR
-{link — posted right after this summary}
+{link — raised right after this}
 ```
 
 ---
 
-### Step 8 — Raise the PR
+### Step 9 — Raise the PR
 ```bash
 git push origin issue/{n}/{description}
 
@@ -219,29 +268,46 @@ gh pr create \
   --base main
 ```
 
-PR body must include:
-- Summary bullets (same as user summary above)
-- How to test locally
-- `Closes #{n}` so GitHub auto-closes the issue on merge
+PR body: summary bullets, how to test, `Closes #{n}`.
 
 ---
 
-### Step 9 — Stop
-PR is raised. Post the PR link to the chat. **Do not merge. Do not touch main.**
-Wait for the human to review and merge.
-
-Once merged, update `docs/PROGRESS.md` — mark the story `✅ Done`.
+### Step 10 — Stop
+PR is raised. Post the PR link. **Do not merge. Do not touch main.**
+Wait for the human to review and merge. Once merged, mark `✅ Done` in `docs/PROGRESS.md`.
 
 ---
 
-### What to do if blocked
-If something genuinely can't be resolved without a human decision (e.g. a product ambiguity, a dependency on something not yet built), post a clear blocker message:
+### Mid-story: when to ask the human
+
+The goal is to run Steps 3–10 without interrupting the human. But sometimes something genuinely unexpected comes up mid-story — a product decision that wasn't foreseeable from the issue, a discovered dependency gap, or a design constraint that changes the approach.
+
+**It is okay to ask mid-story. Keep it to a minimum and make it count.**
+
+When asking:
+- Post one clear message with the specific question — not a stream of "quick questions"
+- Include what you've tried or what the options are
+- Keep going on the parts of the story that don't depend on the answer
+
+Format:
+```
+**Needs your input — Issue #{n}**
+Context: {one sentence on what you hit}
+Question: {specific question}
+Options: A) ... B) ...
+Continuing with: {what I'm doing while you respond}
+```
+
+---
+
+### Blockers (can't continue without human input)
+If something genuinely blocks all further progress:
 
 ```
-**Blocked on Issue #{n}**
+**Blocked — Issue #{n}**
 Reason: {one sentence}
-Decision needed: {specific question with 2–3 options if possible}
-Everything else is done — this is the only thing holding up the PR.
+Decision needed: {specific question with options if possible}
+Everything else is complete — this is the only thing holding up the PR.
 ```
 
 Do not raise a half-finished PR. Either finish it or describe the blocker clearly.
