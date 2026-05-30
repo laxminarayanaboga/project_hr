@@ -3,48 +3,18 @@
 .AppleDouble
 .LSOverride
 
-# Java / Gradle
-target/
-build/
-.gradle/
-*.class
-*.jar
-*.war
-*.ear
-
-# Spring Boot
-*.log
-logs/
-
-# Node
-node_modules/
-dist/
-
-# Environment files (NEVER commit real secrets)
-.env
-.env.local
-.env.production
-*.env
-
-# Terraform
-infrastructure/.terraform/
-infrastructure/*.tfstate
-infrastructure/*.tfstate.backup
-infrastructure/terraform.tfvars
-infrastructure/.terraform.lock.hcl
-infrastructure/crash.log
-
-# React Native
-mobile/*.jks
-mobile/*.keystore
-mobile/ios/Pods/
-
 # IDEs
 .idea/
 *.iml
 .vscode/
 *.swp
 *.swo
+
+# Environment files (NEVER commit real secrets)
+.env
+.env.local
+.env.production
+*.env
 
 # AWS
 .aws/
