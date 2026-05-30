@@ -162,7 +162,7 @@ Local dev runs via `docker-compose up` — no AWS needed for development.
 ## Important Engineering Rules
 
 1. **Never edit the DB manually** — always use Flyway migrations
-2. **Never hardcode secrets** — AWS Secrets Manager only
+2. **Never hardcode secrets** — AWS Secrets Manager only (prod); .env.example for local
 3. **Every query must be scoped to company_id** — multi-tenancy is non-negotiable
 4. **Documents never served directly from S3** — always pre-signed URLs (15-min expiry)
 5. **Soft delete employees** — set `employment_status = TERMINATED`, never hard delete
@@ -170,11 +170,59 @@ Local dev runs via `docker-compose up` — no AWS needed for development.
 
 ---
 
-## Where We Left Off
+## Testing Standards — Non-Negotiable
 
-Requirements and architecture are fully defined. Phase 1 is ready to code.
+A user story is **not done** until all of these pass:
 
-**Next immediate task:** Set up the monorepo structure, Docker Compose for local dev, and the Terraform skeleton for AWS.
+### Backend (per story)
+- **Service layer**: JUnit 5 + Mockito — happy path, edge cases, error paths
+- **Controller layer**: `@WebMvcTest` + MockMvc — all endpoints, auth enforcement, validation
+- **Repository**: `@DataJpaTest` — custom queries and Specifications only (not for generated methods)
+- Run with: `mvn test`
+
+### Frontend (per component/page)
+- **Component tests**: Vitest + React Testing Library — renders, user events, error states
+- Run with: `npm test` inside `frontend/`
+
+### E2E — added once page + API + DB are complete for a story
+- **API tests**: Playwright `request` fixture — no browser, pure HTTP. Happy path + key error cases.
+- **UI tests**: Playwright page automation — full user journey from login to action to assertion.
+- Run with: `npm test` inside `e2e/`
+- API tests only: `npm run test:api`
+- UI tests only: `npm run test:ui`
+
+### Test file naming conventions
+| Layer | Pattern | Example |
+|---|---|---|
+| Backend service | `*ServiceTest.java` | `AuthServiceTest.java` |
+| Backend controller | `*ControllerTest.java` | `AuthControllerTest.java` |
+| Frontend component | `*.test.jsx` | `LoginPage.test.jsx` |
+| Playwright API | `*.api.spec.ts` | `auth.api.spec.ts` |
+| Playwright UI | `*.spec.ts` | `login.spec.ts` |
+
+---
+
+## What Is Deferred (Do NOT implement yet)
+
+| Area | Reason |
+|---|---|
+| **AWS / Terraform / CI-CD** | Personal AWS account — minimise billing. Implement when ready to deploy to staging. |
+| **GitHub Actions workflows** | Exist as skeletons only. Do not wire up or run. |
+| **SES email sending** | Local dev uses logs only. Wire up SES when deploying to staging. |
+| **S3 document storage** | Local dev uses local filesystem or mock. Wire up S3 when deploying to staging. |
+
+**For local development**: `docker-compose up` is the only infrastructure needed.
+
+---
+
+## Where We Are Now
+
+Monorepo scaffolded. Phase 1 coding in progress.
+
+- `docker-compose up` → PostgreSQL + Spring Boot running locally
+- `cd frontend && npm run dev` → React app at http://localhost:5173
+- `cd e2e && npm test` → Playwright tests (API + UI)
+- All 75 GitHub issues created across 7 phases with testing requirements on each
 
 ---
 
