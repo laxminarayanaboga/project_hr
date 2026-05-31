@@ -11,11 +11,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
 public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
     Optional<Employee> findByIdAndCompanyId(UUID id, UUID companyId);
 
     boolean existsByIdAndCompanyId(UUID id, UUID companyId);
+
+    Optional<Employee> findByUserIdAndCompanyId(UUID userId, UUID companyId);
+
+    @Query("""
+            SELECT e FROM Employee e
+            WHERE e.companyId = :companyId
+            AND e.managerId = :managerId
+            AND e.employmentStatus = 'ACTIVE'
+            """)
+    List<Employee> findDirectReports(@Param("companyId") UUID companyId, @Param("managerId") UUID managerId);
 
     long countByCompanyId(UUID companyId);
 

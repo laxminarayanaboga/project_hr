@@ -1,14 +1,18 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Users, Building2, GitBranch, Settings } from 'lucide-react'
+import { LayoutDashboard, Users, Building2, GitBranch, Settings, CalendarDays, ClipboardList, Wallet } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import clsx from 'clsx'
 
 const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
-  { to: '/employees', icon: Users, label: 'Employees', roles: ['HR_ADMIN', 'MANAGER'] },
-  { to: '/departments', icon: Building2, label: 'Departments', roles: ['HR_ADMIN', 'MANAGER'] },
-  { to: '/org-chart', icon: GitBranch, label: 'Org Chart', roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
-  { to: '/settings/company', icon: Settings, label: 'Company Settings', roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/dashboard',            icon: LayoutDashboard, label: 'Dashboard',       roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/employees',            icon: Users,           label: 'Employees',       roles: ['HR_ADMIN', 'MANAGER'] },
+  { to: '/departments',          icon: Building2,       label: 'Departments',     roles: ['HR_ADMIN', 'MANAGER'] },
+  { to: '/org-chart',            icon: GitBranch,       label: 'Org Chart',       roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/leave',                icon: CalendarDays,    label: 'My Leave',        roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/leave/team',           icon: ClipboardList,   label: 'Team Leave',      roles: ['HR_ADMIN', 'MANAGER'] },
+  { to: '/leave/balances',       icon: Wallet,          label: 'Leave Balances',  roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
+  { to: '/settings/leave-types', icon: Settings,        label: 'Leave Types',     roles: ['HR_ADMIN'] },
+  { to: '/settings/company',     icon: Settings,        label: 'Company Settings',roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
 ]
 
 export default function Sidebar() {
