@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,7 +15,20 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
     Optional<Employee> findByIdAndCompanyId(UUID id, UUID companyId);
 
+    boolean existsByIdAndCompanyId(UUID id, UUID companyId);
+
     long countByCompanyId(UUID companyId);
+
+    long countByCompanyIdAndEmploymentStatus(UUID companyId, String status);
+
+    long countByCompanyIdAndStartDateBetween(UUID companyId, LocalDate from, LocalDate to);
+
+    @Query("""
+            SELECT e FROM Employee e
+            WHERE e.companyId = :companyId
+            ORDER BY e.createdAt DESC
+            """)
+    List<Employee> findRecentByCompanyId(@Param("companyId") UUID companyId, Pageable pageable);
 
     @Query(value = """
             SELECT e FROM Employee e

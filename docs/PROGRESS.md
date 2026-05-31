@@ -48,13 +48,13 @@
 ### Week 10–11: Documents
 | Status | Issue | Story |
 |--------|-------|-------|
-| ⬜ | [#16](https://github.com/laxminarayanaboga/project_hr/issues/16) | Upload employee document to S3 |
-| ⬜ | [#17](https://github.com/laxminarayanaboga/project_hr/issues/17) | View & download employee documents |
+| 🔄 | [#16](https://github.com/laxminarayanaboga/project_hr/issues/16) | Upload employee document to S3 |
+| 🔄 | [#17](https://github.com/laxminarayanaboga/project_hr/issues/17) | View & download employee documents |
 
 ### Week 12: Dashboard + Polish
 | Status | Issue | Story |
 |--------|-------|-------|
-| ⬜ | [#18](https://github.com/laxminarayanaboga/project_hr/issues/18) | Dashboard stats & RBAC |
+| 🔄 | [#18](https://github.com/laxminarayanaboga/project_hr/issues/18) | Dashboard stats & RBAC |
 
 ---
 

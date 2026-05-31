@@ -1,12 +1,18 @@
+import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Pencil, UserX, ArrowLeft } from 'lucide-react'
+import { Pencil, UserX, ArrowLeft, Upload } from 'lucide-react'
 import { employeeApi } from '../api/employeeApi'
+import { useAuth } from '../auth/useAuth'
+import DocumentList from '../documents/DocumentList'
+import DocumentUpload from '../documents/DocumentUpload'
 
 export default function EmployeeDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+  const [showUpload, setShowUpload] = useState(false)
 
   const { data, isLoading } = useQuery({
     queryKey: ['employee', id],
@@ -106,6 +112,27 @@ export default function EmployeeDetailPage() {
             </div>
           </dl>
         </div>
+      </div>
+
+      <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-gray-900">Documents</h2>
+          {user?.role === 'HR_ADMIN' && (
+            <button
+              onClick={() => setShowUpload((v) => !v)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Upload size={14} />
+              {showUpload ? 'Cancel upload' : 'Upload document'}
+            </button>
+          )}
+        </div>
+        {showUpload && (
+          <div className="mb-4">
+            <DocumentUpload employeeId={id} onDone={() => setShowUpload(false)} />
+          </div>
+        )}
+        <DocumentList employeeId={id} />
       </div>
     </div>
   )
