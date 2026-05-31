@@ -10,6 +10,8 @@ import com.hrapp.auth.dto.UserInfo;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.company.Company;
 import com.hrapp.company.CompanyRepository;
+import com.hrapp.employee.Employee;
+import com.hrapp.employee.EmployeeRepository;
 import com.hrapp.leavetype.LeaveTypeService;
 import com.hrapp.publicholiday.PublicHolidayService;
 import com.hrapp.user.User;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
@@ -30,6 +33,7 @@ public class AuthService {
 
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
+    private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailService emailService;
@@ -62,6 +66,16 @@ public class AuthService {
         user.setRefreshToken(refreshToken);
         user.setRefreshTokenExpiry(Instant.now().plus(7, ChronoUnit.DAYS));
         userRepository.save(user);
+
+        // Create an employee profile for the admin (the admin is also an employee of their own company)
+        Employee adminEmployee = new Employee();
+        adminEmployee.setCompanyId(company.getId());
+        adminEmployee.setUserId(user.getId());
+        adminEmployee.setFirstName("HR");
+        adminEmployee.setLastName("Admin");
+        adminEmployee.setStartDate(LocalDate.now());
+        adminEmployee.setEmployeeNumber("EMP-ADMIN-001");
+        employeeRepository.save(adminEmployee);
 
         leaveTypeService.seedDefaultsForCompany(company.getId());
         publicHolidayService.seedDefaultsForCompany(company.getId());

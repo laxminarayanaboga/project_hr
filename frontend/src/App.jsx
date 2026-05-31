@@ -18,6 +18,8 @@ import ManagerLeaveQueuePage from './leave/ManagerLeaveQueuePage'
 import LeaveBalancePage from './leave/LeaveBalancePage'
 import LeaveTypesPage from './leave/LeaveTypesPage'
 import PublicHolidaysPage from './leave/PublicHolidaysPage'
+import AttendancePage from './attendance/AttendancePage'
+import OvertimePage from './attendance/OvertimePage'
 
 export default function App() {
   return (
@@ -44,6 +46,8 @@ export default function App() {
             <Route path="/leave/team" element={<ManagerLeaveQueuePage />} />
             <Route path="/settings/leave-types" element={<LeaveTypesPage />} />
             <Route path="/settings/public-holidays" element={<PublicHolidaysPage />} />
+            <Route path="/attendance" element={<AttendancePage />} />
+            <Route path="/attendance/overtime" element={<OvertimePage />} />
           </Route>
         </Route>
 

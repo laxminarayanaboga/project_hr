@@ -53,6 +53,11 @@ hrapp/
 └── docker-compose.yml
 ```
 
+## Demo Data
+
+The `dev` profile automatically seeds three realistic demo companies on first startup.
+Full details — login credentials, data highlights, how to reset — in [docs/seed-data.md](docs/seed-data.md).
+
 ## Database Migrations
 
 Managed by Flyway. **Never edit the DB manually.**

@@ -70,11 +70,12 @@
 | ✅ | [#22](https://github.com/laxminarayanaboga/project_hr/issues/22) | Multi-level approval configuration |
 | ✅ | [#23](https://github.com/laxminarayanaboga/project_hr/issues/23) | Leave balance tracking & accruals |
 | ✅ | [#24](https://github.com/laxminarayanaboga/project_hr/issues/24) | UK public holiday calendar |
-| ⬜ | [#25](https://github.com/laxminarayanaboga/project_hr/issues/25) | Web clock-in / clock-out |
-| ⬜ | [#26](https://github.com/laxminarayanaboga/project_hr/issues/26) | Overtime tracking |
+| 🔄 | [#25](https://github.com/laxminarayanaboga/project_hr/issues/25) | Web clock-in / clock-out |
+| 🔄 | [#26](https://github.com/laxminarayanaboga/project_hr/issues/26) | Overtime tracking |
 | ⬜ | [#27](https://github.com/laxminarayanaboga/project_hr/issues/27) | Leave & absence reports export |
 | ⬜ | [#28](https://github.com/laxminarayanaboga/project_hr/issues/28) | Manager team leave dashboard |
 | ⬜ | [#29](https://github.com/laxminarayanaboga/project_hr/issues/29) | Leave email alerts |
+| ⬜ | [#90](https://github.com/laxminarayanaboga/project_hr/issues/90) | Demo seed data — realistic multi-company dataset |
 
 ---
 

@@ -35,6 +35,9 @@ public class LeaveApprovalService {
 
     @Transactional
     public List<ApprovalChainResponse> setChain(UUID leaveTypeId, List<ApprovalStepRequest> steps) {
+        if (steps.size() > 3) {
+            throw new BusinessException("TOO_MANY_STEPS", "Approval chain cannot have more than 3 steps");
+        }
         UUID companyId = TenantContext.getCurrentCompany();
         stepRepository.deleteByLeaveTypeId(leaveTypeId);
 
