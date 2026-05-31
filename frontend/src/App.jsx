@@ -13,6 +13,11 @@ import EmployeeFormPage from './employees/EmployeeFormPage'
 import DepartmentListPage from './departments/DepartmentListPage'
 import OrgChartPage from './departments/OrgChartPage'
 import CompanySettingsPage from './company/CompanySettingsPage'
+import LeaveRequestPage from './leave/LeaveRequestPage'
+import ManagerLeaveQueuePage from './leave/ManagerLeaveQueuePage'
+import LeaveBalancePage from './leave/LeaveBalancePage'
+import LeaveTypesPage from './leave/LeaveTypesPage'
+import PublicHolidaysPage from './leave/PublicHolidaysPage'
 
 export default function App() {
   return (
@@ -34,6 +39,11 @@ export default function App() {
             <Route path="/departments" element={<DepartmentListPage />} />
             <Route path="/org-chart" element={<OrgChartPage />} />
             <Route path="/settings/company" element={<CompanySettingsPage />} />
+            <Route path="/leave" element={<LeaveRequestPage />} />
+            <Route path="/leave/balances" element={<LeaveBalancePage />} />
+            <Route path="/leave/team" element={<ManagerLeaveQueuePage />} />
+            <Route path="/settings/leave-types" element={<LeaveTypesPage />} />
+            <Route path="/settings/public-holidays" element={<PublicHolidaysPage />} />
           </Route>
         </Route>
 

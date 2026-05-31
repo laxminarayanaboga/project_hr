@@ -40,6 +40,8 @@ class AuthServiceTest {
     @Mock PasswordEncoder passwordEncoder;
     @Mock JwtTokenProvider jwtTokenProvider;
     @Mock EmailService emailService;
+    @Mock com.hrapp.leavetype.LeaveTypeService leaveTypeService;
+    @Mock com.hrapp.publicholiday.PublicHolidayService publicHolidayService;
 
     @InjectMocks AuthService authService;
 

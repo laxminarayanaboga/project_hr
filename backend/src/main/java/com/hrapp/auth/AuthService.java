@@ -10,6 +10,8 @@ import com.hrapp.auth.dto.UserInfo;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.company.Company;
 import com.hrapp.company.CompanyRepository;
+import com.hrapp.leavetype.LeaveTypeService;
+import com.hrapp.publicholiday.PublicHolidayService;
 import com.hrapp.user.User;
 import com.hrapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailService emailService;
+    private final LeaveTypeService leaveTypeService;
+    private final PublicHolidayService publicHolidayService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -58,6 +62,9 @@ public class AuthService {
         user.setRefreshToken(refreshToken);
         user.setRefreshTokenExpiry(Instant.now().plus(7, ChronoUnit.DAYS));
         userRepository.save(user);
+
+        leaveTypeService.seedDefaultsForCompany(company.getId());
+        publicHolidayService.seedDefaultsForCompany(company.getId());
 
         emailService.sendWelcomeEmail(user.getEmail(), company.getName());
 

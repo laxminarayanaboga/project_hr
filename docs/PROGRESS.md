@@ -64,12 +64,12 @@
 
 | Status | Issue | Story |
 |--------|-------|-------|
-| ⬜ | [#19](https://github.com/laxminarayanaboga/project_hr/issues/19) | Leave type configuration |
-| ⬜ | [#20](https://github.com/laxminarayanaboga/project_hr/issues/20) | Employee leave request submission |
-| ⬜ | [#21](https://github.com/laxminarayanaboga/project_hr/issues/21) | Manager leave approval workflow |
-| ⬜ | [#22](https://github.com/laxminarayanaboga/project_hr/issues/22) | Multi-level approval configuration |
-| ⬜ | [#23](https://github.com/laxminarayanaboga/project_hr/issues/23) | Leave balance tracking & accruals |
-| ⬜ | [#24](https://github.com/laxminarayanaboga/project_hr/issues/24) | UK public holiday calendar |
+| ✅ | [#19](https://github.com/laxminarayanaboga/project_hr/issues/19) | Leave type configuration |
+| ✅ | [#20](https://github.com/laxminarayanaboga/project_hr/issues/20) | Employee leave request submission |
+| ✅ | [#21](https://github.com/laxminarayanaboga/project_hr/issues/21) | Manager leave approval workflow |
+| ✅ | [#22](https://github.com/laxminarayanaboga/project_hr/issues/22) | Multi-level approval configuration |
+| ✅ | [#23](https://github.com/laxminarayanaboga/project_hr/issues/23) | Leave balance tracking & accruals |
+| ✅ | [#24](https://github.com/laxminarayanaboga/project_hr/issues/24) | UK public holiday calendar |
 | ⬜ | [#25](https://github.com/laxminarayanaboga/project_hr/issues/25) | Web clock-in / clock-out |
 | ⬜ | [#26](https://github.com/laxminarayanaboga/project_hr/issues/26) | Overtime tracking |
 | ⬜ | [#27](https://github.com/laxminarayanaboga/project_hr/issues/27) | Leave & absence reports export |
