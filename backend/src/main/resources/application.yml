@@ -41,3 +41,6 @@ app:
       from-address: ${SES_FROM_ADDRESS}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
+fcm:
+  enabled: ${FCM_ENABLED:false}

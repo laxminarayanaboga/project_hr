@@ -84,12 +84,12 @@
 
 | Status | Issue | Story |
 |--------|-------|-------|
-| ⬜ | [#30](https://github.com/laxminarayanaboga/project_hr/issues/30) | React Native app setup |
-| ⬜ | [#31](https://github.com/laxminarayanaboga/project_hr/issues/31) | Mobile login & secure session |
-| ⬜ | [#32](https://github.com/laxminarayanaboga/project_hr/issues/32) | Employee directory on mobile |
-| ⬜ | [#33](https://github.com/laxminarayanaboga/project_hr/issues/33) | Leave request & approval on mobile |
-| ⬜ | [#34](https://github.com/laxminarayanaboga/project_hr/issues/34) | Attendance clock-in/out on mobile |
-| ⬜ | [#35](https://github.com/laxminarayanaboga/project_hr/issues/35) | Push notifications |
+| 🔄 | [#30](https://github.com/laxminarayanaboga/project_hr/issues/30) | React Native app setup |
+| 🔄 | [#31](https://github.com/laxminarayanaboga/project_hr/issues/31) | Mobile login & secure session |
+| 🔄 | [#32](https://github.com/laxminarayanaboga/project_hr/issues/32) | Employee directory on mobile |
+| 🔄 | [#33](https://github.com/laxminarayanaboga/project_hr/issues/33) | Leave request & approval on mobile |
+| 🔄 | [#34](https://github.com/laxminarayanaboga/project_hr/issues/34) | Attendance clock-in/out on mobile |
+| 🔄 | [#35](https://github.com/laxminarayanaboga/project_hr/issues/35) | Push notifications |
 | ⬜ | [#36](https://github.com/laxminarayanaboga/project_hr/issues/36) | Payslip viewing on mobile |
 | ⬜ | [#37](https://github.com/laxminarayanaboga/project_hr/issues/37) | App Store & Google Play submission |
 
