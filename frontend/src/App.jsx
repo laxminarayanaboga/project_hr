@@ -9,6 +9,7 @@ import ResetPasswordPage from './auth/ResetPasswordPage'
 import DashboardPage from './dashboard/DashboardPage'
 import EmployeeListPage from './employees/EmployeeListPage'
 import EmployeeDetailPage from './employees/EmployeeDetailPage'
+import EmployeeFormPage from './employees/EmployeeFormPage'
 import DepartmentListPage from './departments/DepartmentListPage'
 import OrgChartPage from './departments/OrgChartPage'
 import CompanySettingsPage from './company/CompanySettingsPage'
@@ -27,7 +28,9 @@ export default function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/employees" element={<EmployeeListPage />} />
+            <Route path="/employees/new" element={<EmployeeFormPage />} />
             <Route path="/employees/:id" element={<EmployeeDetailPage />} />
+            <Route path="/employees/:id/edit" element={<EmployeeFormPage />} />
             <Route path="/departments" element={<DepartmentListPage />} />
             <Route path="/org-chart" element={<OrgChartPage />} />
             <Route path="/settings/company" element={<CompanySettingsPage />} />

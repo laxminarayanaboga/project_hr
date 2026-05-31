@@ -1,26 +1,73 @@
-import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Pencil, UserX, ArrowLeft } from 'lucide-react'
 import { employeeApi } from '../api/employeeApi'
 
 export default function EmployeeDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
   const { data, isLoading } = useQuery({
     queryKey: ['employee', id],
     queryFn: () => employeeApi.get(id).then(r => r.data.data),
   })
 
+  const deactivate = useMutation({
+    mutationFn: () => employeeApi.deactivate(id, { reason: 'Manual deactivation' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employee', id] })
+      queryClient.invalidateQueries({ queryKey: ['employees'] })
+    },
+  })
+
   if (isLoading) return <div className="text-gray-400 text-sm p-8">Loading…</div>
   if (!data) return null
 
+  const isActive = data.employmentStatus === 'ACTIVE'
+
   return (
     <div>
-      <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl">
-          {data.firstName[0]}{data.lastName[0]}
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{data.firstName} {data.lastName}</h1>
-          <p className="text-gray-500">{data.jobTitle} · {data.departmentName}</p>
+      <div className="flex items-center gap-3 mb-6">
+        <Link to="/employees" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <ArrowLeft size={18} className="text-gray-600" />
+        </Link>
+        <div className="flex items-center gap-4 flex-1">
+          <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl">
+            {data.firstName[0]}{data.lastName[0]}
+          </div>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-900">{data.firstName} {data.lastName}</h1>
+            <p className="text-gray-500 text-sm">{data.jobTitle}{data.departmentName ? ` · ${data.departmentName}` : ''}</p>
+          </div>
+          <div className="flex gap-2">
+            {isActive && (
+              <>
+                <Link
+                  to={`/employees/${id}/edit`}
+                  className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                >
+                  <Pencil size={14} /> Edit
+                </Link>
+                <button
+                  onClick={() => {
+                    if (window.confirm(`Deactivate ${data.firstName} ${data.lastName}?`)) {
+                      deactivate.mutate()
+                    }
+                  }}
+                  disabled={deactivate.isPending}
+                  className="flex items-center gap-2 px-3 py-2 border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50 transition-colors disabled:opacity-40"
+                >
+                  <UserX size={14} /> Deactivate
+                </button>
+              </>
+            )}
+            {!isActive && (
+              <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-sm font-medium">
+                {data.employmentStatus}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -28,51 +75,47 @@ export default function EmployeeDetailPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="font-semibold text-gray-900 mb-4">Personal Information</h2>
           <dl className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-gray-500">Email</dt>
-              <dd className="text-gray-900">{data.personalEmail || '—'}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-500">Phone</dt>
-              <dd className="text-gray-900">{data.phone || '—'}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-500">Date of Birth</dt>
-              <dd className="text-gray-900">{data.dateOfBirth || '—'}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-500">Nationality</dt>
-              <dd className="text-gray-900">{data.nationality || '—'}</dd>
-            </div>
+            <Row label="Email" value={data.personalEmail} />
+            <Row label="Phone" value={data.phone} />
+            <Row label="Date of Birth" value={data.dateOfBirth} />
+            <Row label="Nationality" value={data.nationality} />
+            <Row label="Gender" value={data.gender} />
+            <Row label="Address" value={data.address} />
           </dl>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="font-semibold text-gray-900 mb-4">Employment Details</h2>
           <dl className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-gray-500">Employee #</dt>
-              <dd className="text-gray-900">{data.employeeNumber || '—'}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-500">Type</dt>
-              <dd className="text-gray-900">{data.employmentType || '—'}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-500">Start Date</dt>
-              <dd className="text-gray-900">{data.startDate}</dd>
-            </div>
+            <Row label="Employee #" value={data.employeeNumber} />
+            <Row label="Type" value={data.employmentType} />
+            <Row label="Department" value={data.departmentName} />
+            <Row label="Manager" value={data.managerName} />
+            <Row label="Start Date" value={data.startDate} />
+            <Row label="Probation End" value={data.probationEnd} />
+            <Row label="End Date" value={data.endDate} />
             <div className="flex justify-between">
               <dt className="text-gray-500">Status</dt>
               <dd>
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  data.employmentStatus === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                  data.employmentStatus === 'ACTIVE' ? 'bg-green-100 text-green-700' :
+                  data.employmentStatus === 'ON_LEAVE' ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-gray-100 text-gray-600'
                 }`}>{data.employmentStatus}</span>
               </dd>
             </div>
           </dl>
         </div>
       </div>
+    </div>
+  )
+}
+
+function Row({ label, value }) {
+  return (
+    <div className="flex justify-between">
+      <dt className="text-gray-500">{label}</dt>
+      <dd className="text-gray-900 text-right">{value || '—'}</dd>
     </div>
   )
 }
