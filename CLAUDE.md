@@ -192,21 +192,37 @@ gh issue edit {n} --body "$(gh issue view {n} --json body -q .body | sed 's/- \[
 
 ### Step 6 — Test, fix, repeat
 
-```bash
-# Backend
-cd backend && mvn test
+E2E tests **must** run against a clean Docker build with a clean database — not a long-lived dev volume. A passing test on a stale DB is not a passing test.
 
-# Frontend
+```bash
+# 1. Tear down completely and wipe the DB volume
+docker compose down -v
+
+# 2. Rebuild images from scratch (no Docker layer cache)
+docker compose build --no-cache
+
+# 3. Start everything fresh
+docker compose up -d
+
+# 4. Wait for backend to be healthy
+until curl -s http://localhost:8080/actuator/health | grep -q '"status":"UP"'; do sleep 3; done
+
+# 5. Backend unit tests
+cd backend && ./gradlew test
+
+# 6. Frontend unit tests
 cd frontend && npm test
 
-# E2E API tests (docker-compose must be up)
+# 7. E2E API tests
 cd e2e && npm run test:api
 
-# E2E UI tests (both docker-compose and npm run dev must be up)
+# 8. E2E UI tests (frontend dev server must also be running)
 cd e2e && npm run test:ui
 ```
 
-Fix failures. Re-run. Do not raise a PR until all tests are green.
+Fix failures. Re-run the full sequence from step 5. Do not raise a PR until all tests are green on the clean build.
+
+**Why clean build matters:** Flyway migrations that introduce PostgreSQL ENUM types, new NOT NULL columns, or schema constraints may work silently against a long-lived DB volume (which already has existing data) but fail on a fresh install — exactly the failure mode you'll hit in staging and production.
 
 **When tests fail — diagnose first, then fix correctly:**
 
@@ -229,9 +245,11 @@ If tests are failing and the cause is genuinely unclear after honest investigati
 
 ### Step 7 — Pre-PR checklist
 Before raising the PR, verify:
-- [ ] All backend unit tests pass (`mvn test`)
+- [ ] `docker compose down -v && docker compose build --no-cache && docker compose up -d` — clean build, clean DB
+- [ ] All backend unit tests pass (`./gradlew test` in `backend/`)
 - [ ] All frontend unit tests pass (`npm test` in `frontend/`)
-- [ ] Playwright API tests pass (`npm run test:api` in `e2e/`)
+- [ ] Playwright API tests pass on the clean build (`npm run test:api` in `e2e/`)
+- [ ] Playwright UI tests pass on the clean build (`npm run test:ui` in `e2e/`)
 - [ ] No hardcoded secrets, no TODO/FIXME left behind
 - [ ] Every new DB table has `company_id` and is indexed on it
 - [ ] Every service method scopes queries to `TenantContext.getCurrentCompany()`
