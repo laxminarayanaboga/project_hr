@@ -690,4 +690,167 @@ JOIN attendance_records ar ON ar.employee_id = ot.emp AND ar.company_id = v_tho_
 WHERE NOT EXISTS (SELECT 1 FROM overtime_records ov WHERE ov.attendance_record_id = ar.id)
 LIMIT 7;
 
+-- =============================================================================
+-- PERSONAL INFORMATION — email, phone, DOB, gender, nationality, address,
+-- employee number, probation end. Uses literal UUIDs so no PL/pgSQL
+-- substitution issues. Fully idempotent (re-sets same values each run).
+-- =============================================================================
+
+-- Pinnacle Digital Ltd
+UPDATE employees e
+SET personal_email  = v.pe,
+    phone           = v.ph,
+    date_of_birth   = v.dob,
+    gender          = v.gen,
+    nationality     = v.nat,
+    address         = v.addr,
+    employee_number = v.enum,
+    probation_end   = v.prob
+FROM (VALUES
+    ('11111111-0003-4000-8000-000000000001'::uuid,'sarah.m@hotmail.co.uk',       '+44 7711 234001','1985-03-15'::date,'Female','British',        '24 Elm Street, Bethnal Green, London, E2 6LT',         'PIN-001',NULL::date),
+    ('11111111-0003-4000-8000-000000000002'::uuid,'james.thornton82@gmail.com',  '+44 7711 234002','1979-07-22'::date,'Male',  'British',        '15 Hoxton Square, Hackney, London, N1 6NT',            'PIN-002',NULL::date),
+    ('11111111-0003-4000-8000-000000000003'::uuid,'rachel.chen@gmail.com',       '+44 7711 234003','1987-11-04'::date,'Female','British',        '42 Brick Lane, Tower Hamlets, London, E1 6RF',         'PIN-003',NULL::date),
+    ('11111111-0003-4000-8000-000000000004'::uuid,'danpatel88@yahoo.co.uk',      '+44 7711 234004','1988-05-19'::date,'Male',  'British',        '7 Columbia Road, Bethnal Green, London, E2 7RG',       'PIN-004',NULL::date),
+    ('11111111-0003-4000-8000-000000000005'::uuid,'sophie.walker@gmail.com',     '+44 7711 234005','1990-08-30'::date,'Female','British',        '31 Roman Road, Bow, London, E3 5QR',                   'PIN-005',NULL::date),
+    ('11111111-0003-4000-8000-000000000006'::uuid,'alexmorgan.design@outlook.com','+44 7711 234006','1989-01-12'::date,'Male', 'British',        '19 Redchurch Street, Shoreditch, London, E2 7DJ',      'PIN-006',NULL::date),
+    ('11111111-0003-4000-8000-000000000007'::uuid,'liam.harris.dev@gmail.com',   '+44 7711 234007','1993-06-25'::date,'Male',  'British',        '88 Whitechapel Road, London, E1 1JX',                  'PIN-007',NULL::date),
+    ('11111111-0003-4000-8000-000000000008'::uuid,'emma.wilson95@gmail.com',     '+44 7711 234008','1994-09-03'::date,'Female','British',        '14 Stepney Green, London, E1 3JX',                     'PIN-008',NULL::date),
+    ('11111111-0003-4000-8000-000000000009'::uuid,'noahjones@gmail.com',         '+44 7711 234009','1999-02-14'::date,'Male',  'British',        '56 Cambridge Heath Road, London, E2 9DA',              'PIN-009','2023-05-01'::date),
+    ('11111111-0003-4000-8000-000000000010'::uuid,'olivia.b@hotmail.co.uk',      '+44 7711 234010','1992-12-07'::date,'Female','British',        '3 Weaver Street, Shoreditch, London, E1 6QX',          'PIN-010',NULL::date),
+    ('11111111-0003-4000-8000-000000000011'::uuid,'will.taylor.dev@gmail.com',   '+44 7711 234011','1995-04-18'::date,'Male',  'British',        '72 Old Street, Hackney, London, EC1V 9HX',             'PIN-011',NULL::date),
+    ('11111111-0003-4000-8000-000000000012'::uuid,'ava.anderson@outlook.com',    '+44 7711 234012','2001-07-09'::date,'Female','British',        '29 Kingsland Road, Dalston, London, E8 4AB',           'PIN-012','2023-12-04'::date),
+    ('11111111-0003-4000-8000-000000000013'::uuid,'james.white.qa@gmail.com',    '+44 7711 234013','1990-11-28'::date,'Male',  'British',        '45 Bethnal Green Road, London, E1 6LA',                'PIN-013',NULL::date),
+    ('11111111-0003-4000-8000-000000000014'::uuid,'isabella.martin@gmail.com',   '+44 7711 234014','1997-03-22'::date,'Female','British',        '11 Arnold Circus, Shoreditch, London, E2 7JR',         'PIN-014','2023-04-09'::date),
+    ('11111111-0003-4000-8000-000000000015'::uuid,'oliver.thomas.design@gmail.com','+44 7711 234015','1991-09-16'::date,'Male','British',        '63 Curtain Road, Shoreditch, London, EC2A 3PE',        'PIN-015',NULL::date),
+    ('11111111-0003-4000-8000-000000000016'::uuid,'mia.jackson@gmail.com',       '+44 7711 234016','1996-05-01'::date,'Female','British',        '38 Great Eastern Street, Shoreditch, London, EC2A 3JL','PIN-016','2023-09-12'::date),
+    ('11111111-0003-4000-8000-000000000017'::uuid,'elijah.lee@yahoo.co.uk',      '+44 7711 234017','1988-10-13'::date,'Male',  'British',        '27 Commercial Street, Spitalfields, London, E1 6LP',   'PIN-017',NULL::date),
+    ('11111111-0003-4000-8000-000000000018'::uuid,'charlotte.hall@gmail.com',    '+44 7711 234018','1994-08-24'::date,'Female','British',        '16 Hanbury Street, Spitalfields, London, E1 5JP',      'PIN-018',NULL::date),
+    ('11111111-0003-4000-8000-000000000019'::uuid,'lucas.young@hotmail.co.uk',   '+44 7711 234019','1997-12-05'::date,'Male',  'British',        '52 Fashion Street, Spitalfields, London, E1 6PX',      'PIN-019','2023-06-13'::date),
+    ('11111111-0003-4000-8000-000000000022'::uuid,'harper.scott@gmail.com',      '+44 7711 234022','1998-01-23'::date,'Female','British',        '19 Toynbee Street, Aldgate, London, E1 7NE',           'PIN-022','2024-08-01'::date),
+    ('11111111-0003-4000-8000-000000000023'::uuid,'tom.newman@gmail.com',        '+44 7711 234023','1993-06-11'::date,'Male',  'Irish',          '44 Back Church Lane, Whitechapel, London, E1 1LX',     'PIN-023','2025-04-06'::date)
+) AS v(eid, pe, ph, dob, gen, nat, addr, enum, prob)
+WHERE e.id = v.eid;
+
+-- Pinnacle — recently joined (probation = start_date + 3 months, derived dynamically)
+UPDATE employees SET
+    personal_email  = 'amelia.king@gmail.com',
+    phone           = '+44 7711 234020',
+    date_of_birth   = '2001-04-17',
+    gender          = 'Female',
+    nationality     = 'British',
+    address         = '8 Princelet Street, Spitalfields, London, E1 5QA',
+    employee_number = 'PIN-020',
+    probation_end   = (start_date + INTERVAL '3 months')::date
+WHERE id = '11111111-0003-4000-8000-000000000020';
+
+UPDATE employees SET
+    personal_email  = 'henry.wright@outlook.com',
+    phone           = '+44 7711 234021',
+    date_of_birth   = '2000-08-30',
+    gender          = 'Male',
+    nationality     = 'British',
+    address         = '33 Fournier Street, Spitalfields, London, E1 6QE',
+    employee_number = 'PIN-021',
+    probation_end   = (start_date + INTERVAL '3 months')::date
+WHERE id = '11111111-0003-4000-8000-000000000021';
+
+-- Blossom Care Services
+UPDATE employees e
+SET personal_email  = v.pe,
+    phone           = v.ph,
+    date_of_birth   = v.dob,
+    gender          = v.gen,
+    nationality     = v.nat,
+    address         = v.addr,
+    employee_number = v.enum,
+    probation_end   = v.prob
+FROM (VALUES
+    ('22222222-0003-4000-8000-000000000001'::uuid,'sandra.blake@gmail.com',      '+44 7712 345001','1978-05-08'::date,'Female','British',        '14 Princess Road, Moss Side, Manchester, M14 4RW',     'BLO-001',NULL::date),
+    ('22222222-0003-4000-8000-000000000002'::uuid,'diane.foster@hotmail.co.uk',  '+44 7712 345002','1973-11-20'::date,'Female','British',        '6 Wilmslow Road, Fallowfield, Manchester, M14 6AB',    'BLO-002',NULL::date),
+    ('22222222-0003-4000-8000-000000000003'::uuid,'kevin.nash@gmail.com',        '+44 7712 345003','1980-03-14'::date,'Male',  'British',        '32 Parkside Avenue, Levenshulme, Manchester, M19 3EP', 'BLO-003',NULL::date),
+    ('22222222-0003-4000-8000-000000000004'::uuid,'priya.sharma@gmail.com',      '+44 7712 345004','1989-07-29'::date,'Female','British',        '8 Victoria Avenue, Didsbury, Manchester, M20 2GE',     'BLO-004',NULL::date),
+    ('22222222-0003-4000-8000-000000000005'::uuid,'thomas.hall88@gmail.com',     '+44 7712 345005','1988-02-17'::date,'Male',  'British',        '24 Mauldeth Road, Withington, Manchester, M20 4PG',    'BLO-005',NULL::date),
+    ('22222222-0003-4000-8000-000000000006'::uuid,'claire.ross@outlook.com',     '+44 7712 345006','1990-09-05'::date,'Female','British',        '19 Palatine Road, Didsbury, Manchester, M20 3LZ',      'BLO-006',NULL::date),
+    ('22222222-0003-4000-8000-000000000007'::uuid,'mark.ali@gmail.com',          '+44 7712 345007','1987-12-22'::date,'Male',  'British',        '55 Stockport Road, Longsight, Manchester, M13 0LF',    'BLO-007',NULL::date),
+    ('22222222-0003-4000-8000-000000000008'::uuid,'zoe.khan@gmail.com',          '+44 7712 345008','1999-04-11'::date,'Female','British',        '37 Plymouth Grove, Victoria Park, Manchester, M13 0AH','BLO-008','2024-05-01'::date),
+    ('22222222-0003-4000-8000-000000000009'::uuid,'ben.cox@hotmail.co.uk',       '+44 7712 345009','1991-08-03'::date,'Male',  'British',        '12 Whitworth Street West, Manchester, M1 5WX',         'BLO-009',NULL::date),
+    ('22222222-0003-4000-8000-000000000010'::uuid,'nina.wood@gmail.com',         '+44 7712 345010','1996-01-28'::date,'Female','British',        '44 Oxford Road, Chorlton-cum-Hardy, Manchester, M21 9EZ','BLO-010',NULL::date)
+) AS v(eid, pe, ph, dob, gen, nat, addr, enum, prob)
+WHERE e.id = v.eid;
+
+-- Blossom — recently joined
+UPDATE employees SET
+    personal_email  = 'leo.price@gmail.com',
+    phone           = '+44 7712 345011',
+    date_of_birth   = '2001-10-15',
+    gender          = 'Male',
+    nationality     = 'British',
+    address         = '71 Lapwing Lane, West Didsbury, Manchester, M20 2WH',
+    employee_number = 'BLO-011',
+    probation_end   = (start_date + INTERVAL '3 months')::date
+WHERE id = '22222222-0003-4000-8000-000000000011';
+
+-- Thornwood Consulting Group
+UPDATE employees e
+SET personal_email  = v.pe,
+    phone           = v.ph,
+    date_of_birth   = v.dob,
+    gender          = v.gen,
+    nationality     = v.nat,
+    address         = v.addr,
+    employee_number = v.enum,
+    probation_end   = v.prob
+FROM (VALUES
+    ('33333333-0003-4000-8000-000000000001'::uuid,'patricia.owen@gmail.com',        '+44 7713 456001','1972-04-16'::date,'Female','British',  '5 Cannon Place, City of London, EC4N 6AF',            'THO-001',NULL::date),
+    ('33333333-0003-4000-8000-000000000002'::uuid,'richard.hayes.ceo@gmail.com',    '+44 7713 456002','1968-09-30'::date,'Male',  'British',  '18 Cheapside, City of London, EC2V 6AN',              'THO-002',NULL::date),
+    ('33333333-0003-4000-8000-000000000003'::uuid,'fiona.grant@gmail.com',           '+44 7713 456003','1974-02-14'::date,'Female','British',  '12 Aldgate High Street, London, EC3N 1AH',            'THO-003',NULL::date),
+    ('33333333-0003-4000-8000-000000000004'::uuid,'marcus.bell@outlook.com',         '+44 7713 456004','1971-11-22'::date,'Male',  'British',  '24 Monument Street, City of London, EC3R 8BQ',        'THO-004',NULL::date),
+    ('33333333-0003-4000-8000-000000000005'::uuid,'helen.shaw@gmail.com',            '+44 7713 456005','1975-07-08'::date,'Female','British',  '9 Lombard Street, City of London, EC3V 9AA',          'THO-005',NULL::date),
+    ('33333333-0003-4000-8000-000000000006'::uuid,'adam.ford.it@gmail.com',          '+44 7713 456006','1981-05-19'::date,'Male',  'British',  '33 Gracechurch Street, City of London, EC3V 0AT',     'THO-006',NULL::date),
+    ('33333333-0003-4000-8000-000000000007'::uuid,'claire.hunt@hotmail.co.uk',       '+44 7713 456007','1984-10-07'::date,'Female','British',  '15 Cornhill, City of London, EC3V 3ND',               'THO-007',NULL::date),
+    ('33333333-0003-4000-8000-000000000008'::uuid,'paul.green@gmail.com',            '+44 7713 456008','1983-03-25'::date,'Male',  'British',  '41 King William Street, London, EC4R 9AW',            'THO-008',NULL::date),
+    ('33333333-0003-4000-8000-000000000009'::uuid,'lisa.west@gmail.com',             '+44 7713 456009','1985-12-03'::date,'Female','British',  '7 Threadneedle Street, London, EC2R 8AY',             'THO-009',NULL::date),
+    ('33333333-0003-4000-8000-000000000010'::uuid,'jack.cooper@gmail.com',           '+44 7713 456010','1990-08-14'::date,'Male',  'British',  '28 Bishopsgate, City of London, EC2N 4AJ',            'THO-010',NULL::date),
+    ('33333333-0003-4000-8000-000000000011'::uuid,'grace.mills@gmail.com',           '+44 7713 456011','1994-05-27'::date,'Female','British',  '16 Liverpool Street, London, EC2M 7PY',               'THO-011',NULL::date),
+    ('33333333-0003-4000-8000-000000000012'::uuid,'ben.reed@outlook.com',            '+44 7713 456012','1998-01-18'::date,'Male',  'British',  '54 Moorgate, London, EC2R 6BJ',                       'THO-012','2023-08-01'::date),
+    ('33333333-0003-4000-8000-000000000013'::uuid,'ella.ross@gmail.com',             '+44 7713 456013','1988-07-05'::date,'Female','British',  '3 Gresham Street, London, EC2V 7BX',                  'THO-013',NULL::date),
+    ('33333333-0003-4000-8000-000000000014'::uuid,'dan.cole@hotmail.co.uk',          '+44 7713 456014','1993-11-09'::date,'Male',  'British',  '19 Wood Street, London, EC2V 7QA',                    'THO-014',NULL::date),
+    ('33333333-0003-4000-8000-000000000015'::uuid,'kate.ward@gmail.com',             '+44 7713 456015','1997-04-23'::date,'Female','British',  '38 London Wall, London, EC2M 5TP',                    'THO-015','2023-12-04'::date),
+    ('33333333-0003-4000-8000-000000000016'::uuid,'sam.lane@gmail.com',              '+44 7713 456016','1991-09-11'::date,'Male',  'British',  '22 Basinghall Street, London, EC2V 5DN',              'THO-016',NULL::date),
+    ('33333333-0003-4000-8000-000000000017'::uuid,'amy.price@gmail.com',             '+44 7713 456017','1995-02-28'::date,'Female','British',  '47 Coleman Street, London, EC2R 5AN',                 'THO-017',NULL::date),
+    ('33333333-0003-4000-8000-000000000018'::uuid,'jake.stone@gmail.com',            '+44 7713 456018','1986-06-17'::date,'Male',  'British',  '9 Lothbury, City of London, EC2R 7HH',                'THO-018',NULL::date),
+    ('33333333-0003-4000-8000-000000000019'::uuid,'lucy.ford@gmail.com',             '+44 7713 456019','1991-12-04'::date,'Female','British',  '31 Copthall Avenue, London, EC2R 7DJ',                'THO-019',NULL::date),
+    ('33333333-0003-4000-8000-000000000020'::uuid,'ryan.hill@hotmail.co.uk',         '+44 7713 456020','1995-08-21'::date,'Male',  'British',  '13 London Wall, London, EC2M 1PY',                    'THO-020',NULL::date),
+    ('33333333-0003-4000-8000-000000000021'::uuid,'anna.dean@gmail.com',             '+44 7713 456021','1987-03-09'::date,'Female','British',  '44 Austin Friars, London, EC2N 2HA',                  'THO-021',NULL::date),
+    ('33333333-0003-4000-8000-000000000022'::uuid,'will.cross@gmail.com',            '+44 7713 456022','1994-10-16'::date,'Male',  'British',  '6 Finch Lane, London, EC3V 3NA',                      'THO-022',NULL::date),
+    ('33333333-0003-4000-8000-000000000023'::uuid,'meg.hunt@outlook.com',            '+44 7713 456023','1992-07-30'::date,'Female','British',  '25 St Mary Axe, London, EC3A 8BF',                    'THO-023',NULL::date),
+    ('33333333-0003-4000-8000-000000000024'::uuid,'chris.bain@gmail.com',            '+44 7713 456024','1996-03-12'::date,'Male',  'British',  '17 Mincing Lane, London, EC3R 7PP',                   'THO-024','2024-02-06'::date),
+    ('33333333-0003-4000-8000-000000000025'::uuid,'sara.lowe@gmail.com',             '+44 7713 456025','1999-11-07'::date,'Female','British',  '39 Fenchurch Street, London, EC3M 4DT',               'THO-025','2024-06-11'::date),
+    ('33333333-0003-4000-8000-000000000026'::uuid,'joe.wade@hotmail.co.uk',          '+44 7713 456026','1998-06-25'::date,'Male',  'British',  '52 Eastcheap, London, EC3M 1JS',                      'THO-026','2024-10-01'::date)
+) AS v(eid, pe, ph, dob, gen, nat, addr, enum, prob)
+WHERE e.id = v.eid;
+
+-- Thornwood — recently joined
+UPDATE employees SET
+    personal_email  = 'beth.king@gmail.com',
+    phone           = '+44 7713 456027',
+    date_of_birth   = '2001-02-14',
+    gender          = 'Female',
+    nationality     = 'British',
+    address         = '8 Gracechurch Street, London, EC3V 0AT',
+    employee_number = 'THO-027',
+    probation_end   = (start_date + INTERVAL '3 months')::date
+WHERE id = '33333333-0003-4000-8000-000000000027';
+
+UPDATE employees SET
+    personal_email  = 'owen.newman@gmail.com',
+    phone           = '+44 7713 456028',
+    date_of_birth   = '2002-09-03',
+    gender          = 'Male',
+    nationality     = 'British',
+    address         = '14 Lombard Court, London, EC3V 9BE',
+    employee_number = 'THO-028',
+    probation_end   = (start_date + INTERVAL '3 months')::date
+WHERE id = '33333333-0003-4000-8000-000000000028';
+
 END $$;
