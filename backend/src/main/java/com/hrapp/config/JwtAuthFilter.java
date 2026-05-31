@@ -2,6 +2,7 @@ package com.hrapp.config;
 
 import com.hrapp.auth.JwtTokenProvider;
 import com.hrapp.common.multitenancy.TenantContext;
+import com.hrapp.common.multitenancy.UserContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,6 +48,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (jwtTokenProvider.isTokenValid(token, userDetails)) {
                     UUID companyId = jwtTokenProvider.extractCompanyId(token);
                     TenantContext.setCurrentCompany(companyId);
+                    UserContext.setCurrentUser(jwtTokenProvider.extractUserId(token));
 
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -62,6 +64,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } finally {
             TenantContext.clear();
+            UserContext.clear();
         }
     }
 }

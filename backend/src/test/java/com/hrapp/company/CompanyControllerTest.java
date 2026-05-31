@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hrapp.common.exception.GlobalExceptionHandler;
 import com.hrapp.common.exception.ResourceNotFoundException;
 import com.hrapp.company.dto.CompanyProfileResponse;
+import com.hrapp.company.dto.CompanyStatsResponse;
 import com.hrapp.company.dto.UpdateCompanyRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.UUID;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -125,6 +128,26 @@ class CompanyControllerTest {
         mvc.perform(multipart("/api/v1/company/logo").file(file))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.logoUrl").value("/uploads/logos/abc.png"));
+    }
+
+    // ── GET /company/stats ────────────────────────────────────────────────────
+
+    @Test
+    void getStats_200_returnsStatsData() throws Exception {
+        CompanyStatsResponse stats = new CompanyStatsResponse(
+                10, 8, 3, 2,
+                List.of(new CompanyStatsResponse.RecentHire(UUID.randomUUID(), "Jane", "Doe", "Engineer", "Engineering"))
+        );
+        when(companyService.getStats()).thenReturn(stats);
+
+        mvc.perform(get("/api/v1/company/stats"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.totalEmployees").value(10))
+                .andExpect(jsonPath("$.data.activeEmployees").value(8))
+                .andExpect(jsonPath("$.data.totalDepartments").value(3))
+                .andExpect(jsonPath("$.data.newHiresThisMonth").value(2))
+                .andExpect(jsonPath("$.data.recentHires[0].firstName").value("Jane"));
     }
 
     @Test

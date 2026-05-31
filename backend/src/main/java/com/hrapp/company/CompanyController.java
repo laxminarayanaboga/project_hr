@@ -2,6 +2,7 @@ package com.hrapp.company;
 
 import com.hrapp.common.response.ApiResponse;
 import com.hrapp.company.dto.CompanyProfileResponse;
+import com.hrapp.company.dto.CompanyStatsResponse;
 import com.hrapp.company.dto.UpdateCompanyRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,11 @@ public class CompanyController {
     public ResponseEntity<ApiResponse<CompanyProfileResponse>> updateProfile(
             @Valid @RequestBody UpdateCompanyRequest request) {
         return ResponseEntity.ok(ApiResponse.success(companyService.updateProfile(request), "Company profile updated"));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<CompanyStatsResponse>> getStats() {
+        return ResponseEntity.ok(ApiResponse.success(companyService.getStats(), "Stats retrieved"));
     }
 
     @PostMapping(value = "/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
