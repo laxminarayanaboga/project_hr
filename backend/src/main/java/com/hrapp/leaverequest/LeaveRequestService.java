@@ -1,6 +1,5 @@
 package com.hrapp.leaverequest;
 
-import com.hrapp.auth.EmailService;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.common.exception.ResourceNotFoundException;
 import com.hrapp.common.multitenancy.TenantContext;
@@ -16,6 +15,9 @@ import com.hrapp.leaverequest.dto.LeaveRequestResponse;
 import com.hrapp.leaverequest.dto.TeamLeaveEntry;
 import com.hrapp.leavetype.LeaveType;
 import com.hrapp.leavetype.LeaveTypeService;
+import com.hrapp.notification.LeaveNotificationService;
+import com.hrapp.user.User;
+import com.hrapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +40,8 @@ public class LeaveRequestService {
     private final LeaveBalanceService leaveBalanceService;
     private final LeaveApprovalService leaveApprovalService;
     private final BusinessDayCalculator businessDayCalculator;
-    private final EmailService emailService;
+    private final LeaveNotificationService notificationService;
+    private final UserRepository userRepository;
 
     @Transactional
     public LeaveRequestResponse submit(CreateLeaveRequestRequest request) {
@@ -94,12 +97,7 @@ public class LeaveRequestService {
         LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
         leaveApprovalService.createApprovalStepsForRequest(saved);
 
-        emailService.sendLeaveSubmittedEmail(
-                userId.toString(), // in prod: look up email
-                employee.getManagerId() != null ? employee.getManagerId().toString() : "hr",
-                leaveType.getName(),
-                request.startDate() + " to " + request.endDate()
-        );
+        fireLeaveSubmittedNotification(employee, leaveType, saved, request.reason(), companyId);
 
         return toResponse(saved, employee, leaveType);
     }
@@ -194,8 +192,7 @@ public class LeaveRequestService {
             lr.setUpdatedAt(Instant.now());
             leaveRequestRepository.save(lr);
             leaveBalanceService.deductBalance(lr.getEmployeeId(), lr.getLeaveTypeId(), companyId, lr.getWorkingDays());
-            emailService.sendLeaveApprovedEmail(lr.getEmployeeId().toString(),
-                    lr.getLeaveTypeId().toString(), lr.getStartDate() + " to " + lr.getEndDate());
+            fireLeaveApprovedNotification(lr, companyId);
         }
 
         LeaveType lt = leaveTypeService.findByIdAndCompanyId(lr.getLeaveTypeId(), companyId);
@@ -227,8 +224,7 @@ public class LeaveRequestService {
         lr.setUpdatedAt(Instant.now());
         leaveRequestRepository.save(lr);
 
-        emailService.sendLeaveRejectedEmail(lr.getEmployeeId().toString(),
-                lr.getLeaveTypeId().toString(), request.comment());
+        fireLeaveRejectedNotification(lr, request.comment(), companyId);
 
         LeaveType lt = leaveTypeService.findByIdAndCompanyId(lr.getLeaveTypeId(), companyId);
         Employee emp = employeeRepository.findByIdAndCompanyId(lr.getEmployeeId(), companyId)
@@ -324,5 +320,63 @@ public class LeaveRequestService {
                 .getAuthentication().getAuthorities().stream()
                 .findFirst().map(a -> a.getAuthority().replace("ROLE_", ""))
                 .orElse("");
+    }
+
+    private void fireLeaveSubmittedNotification(Employee employee, LeaveType leaveType,
+                                                 LeaveRequest saved, String reason, UUID companyId) {
+        if (employee.getManagerId() == null) return;
+        Employee manager = employeeRepository.findByIdAndCompanyId(employee.getManagerId(), companyId).orElse(null);
+        if (manager == null || manager.getUserId() == null) return;
+        User managerUser = userRepository.findById(manager.getUserId()).orElse(null);
+        if (managerUser == null) return;
+        User employeeUser = employee.getUserId() != null
+                ? userRepository.findById(employee.getUserId()).orElse(null) : null;
+        String employeeEmail = employeeUser != null ? employeeUser.getEmail()
+                : employee.getFirstName() + "." + employee.getLastName() + "@company.com";
+
+        notificationService.sendLeaveSubmitted(new LeaveNotificationService.LeaveSubmittedEvent(
+                managerUser.getEmail(),
+                manager.getFirstName() + " " + manager.getLastName(),
+                employee.getFirstName() + " " + employee.getLastName(),
+                leaveType.getName(),
+                saved.getStartDate(),
+                saved.getEndDate(),
+                saved.getWorkingDays(),
+                reason
+        ));
+    }
+
+    private void fireLeaveApprovedNotification(LeaveRequest lr, UUID companyId) {
+        Employee emp = employeeRepository.findByIdAndCompanyId(lr.getEmployeeId(), companyId).orElse(null);
+        if (emp == null || emp.getUserId() == null) return;
+        User user = userRepository.findById(emp.getUserId()).orElse(null);
+        if (user == null) return;
+        LeaveType lt = leaveTypeService.findByIdAndCompanyId(lr.getLeaveTypeId(), companyId);
+        notificationService.sendLeaveApproved(new LeaveNotificationService.LeaveStatusEvent(
+                user.getEmail(),
+                emp.getFirstName() + " " + emp.getLastName(),
+                lt.getName(),
+                lr.getStartDate(),
+                lr.getEndDate(),
+                lr.getWorkingDays(),
+                null
+        ));
+    }
+
+    private void fireLeaveRejectedNotification(LeaveRequest lr, String reason, UUID companyId) {
+        Employee emp = employeeRepository.findByIdAndCompanyId(lr.getEmployeeId(), companyId).orElse(null);
+        if (emp == null || emp.getUserId() == null) return;
+        User user = userRepository.findById(emp.getUserId()).orElse(null);
+        if (user == null) return;
+        LeaveType lt = leaveTypeService.findByIdAndCompanyId(lr.getLeaveTypeId(), companyId);
+        notificationService.sendLeaveRejected(new LeaveNotificationService.LeaveStatusEvent(
+                user.getEmail(),
+                emp.getFirstName() + " " + emp.getLastName(),
+                lt.getName(),
+                lr.getStartDate(),
+                lr.getEndDate(),
+                lr.getWorkingDays(),
+                reason
+        ));
     }
 }

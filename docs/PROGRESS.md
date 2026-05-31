@@ -74,8 +74,8 @@
 | ✅ | [#26](https://github.com/laxminarayanaboga/project_hr/issues/26) | Overtime tracking |
 | ✅ | [#27](https://github.com/laxminarayanaboga/project_hr/issues/27) | Leave & absence reports export |
 | ✅ | [#28](https://github.com/laxminarayanaboga/project_hr/issues/28) | Manager team leave dashboard |
-| ⬜ | [#29](https://github.com/laxminarayanaboga/project_hr/issues/29) | Leave email alerts |
-| ⬜ | [#90](https://github.com/laxminarayanaboga/project_hr/issues/90) | Demo seed data — realistic multi-company dataset |
+| ✅ | [#29](https://github.com/laxminarayanaboga/project_hr/issues/29) | Leave email alerts |
+| ✅ | [#90](https://github.com/laxminarayanaboga/project_hr/issues/90) | Demo seed data — realistic multi-company dataset |
 
 ---
 

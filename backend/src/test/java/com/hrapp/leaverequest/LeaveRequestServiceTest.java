@@ -1,6 +1,5 @@
 package com.hrapp.leaverequest;
 
-import com.hrapp.auth.EmailService;
 import com.hrapp.common.exception.BusinessException;
 import com.hrapp.common.multitenancy.TenantContext;
 import com.hrapp.common.multitenancy.UserContext;
@@ -14,6 +13,8 @@ import com.hrapp.leaverequest.dto.LeaveRequestResponse;
 import com.hrapp.leavetype.LeaveType;
 import com.hrapp.leavetype.AccrualMethod;
 import com.hrapp.leavetype.LeaveTypeService;
+import com.hrapp.notification.LeaveNotificationService;
+import com.hrapp.user.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,8 @@ class LeaveRequestServiceTest {
     @Mock LeaveBalanceService leaveBalanceService;
     @Mock LeaveApprovalService leaveApprovalService;
     @Mock BusinessDayCalculator businessDayCalculator;
-    @Mock EmailService emailService;
+    @Mock LeaveNotificationService notificationService;
+    @Mock UserRepository userRepository;
 
     @InjectMocks LeaveRequestService service;
 
