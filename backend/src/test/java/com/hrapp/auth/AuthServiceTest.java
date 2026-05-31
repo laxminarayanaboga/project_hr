@@ -37,6 +37,7 @@ class AuthServiceTest {
 
     @Mock CompanyRepository companyRepository;
     @Mock UserRepository userRepository;
+    @Mock com.hrapp.employee.EmployeeRepository employeeRepository;
     @Mock PasswordEncoder passwordEncoder;
     @Mock JwtTokenProvider jwtTokenProvider;
     @Mock EmailService emailService;

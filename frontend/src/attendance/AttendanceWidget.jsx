@@ -20,7 +20,11 @@ export default function AttendanceWidget() {
 
   const clockOut = useMutation({
     mutationFn: () => attendanceApi.clockOut(),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['attendance-today'] }); setError(null) },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['attendance-today'] })
+      qc.invalidateQueries({ queryKey: ['attendance-history'] })
+      setError(null)
+    },
     onError: (e) => setError(e.response?.data?.message || 'Failed to clock out'),
   })
 

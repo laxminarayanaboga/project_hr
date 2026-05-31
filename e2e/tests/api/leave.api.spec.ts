@@ -116,8 +116,8 @@ test.describe('Leave Requests API', () => {
     const res = await authedRequest.post('/api/v1/leaves', {
       data: {
         leaveTypeId: annualLeave.id,
-        startDate: '2026-10-01',
-        endDate: '2026-10-03',
+        startDate: '2026-10-05',
+        endDate: '2026-10-07',
         reason: 'Holiday',
       },
     })

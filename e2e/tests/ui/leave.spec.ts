@@ -41,7 +41,7 @@ test.describe('Public Holidays Page', () => {
 
 test.describe('Leave Request Page', () => {
   test.beforeEach(async ({ page, loginAs }) => {
-    await loginAs('EMPLOYEE')
+    await loginAs('HR_ADMIN')
     await page.goto('/leave')
   })
 

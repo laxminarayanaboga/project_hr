@@ -2,7 +2,7 @@ import { test, expect } from '../../fixtures/auth.fixture'
 
 test.describe('Attendance Page', () => {
   test.beforeEach(async ({ page, loginAs }) => {
-    await loginAs('EMPLOYEE')
+    await loginAs('HR_ADMIN')
     await page.goto('/attendance')
   })
 
