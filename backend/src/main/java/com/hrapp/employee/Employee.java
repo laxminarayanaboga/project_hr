@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -76,4 +77,7 @@ public class Employee extends Auditable {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
+
+    @Column(name = "contracted_hours_per_week", nullable = false)
+    private BigDecimal contractedHoursPerWeek = BigDecimal.valueOf(40.0);
 }

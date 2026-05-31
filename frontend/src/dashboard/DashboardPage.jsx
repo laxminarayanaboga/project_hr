@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Users, Building2, UserCheck, UserX } from 'lucide-react'
 import api from '../api/axios'
+import AttendanceWidget from '../attendance/AttendanceWidget'
 
 function StatCard({ icon: Icon, label, value, color }) {
   return (
@@ -31,6 +32,12 @@ export default function DashboardPage() {
         <StatCard icon={UserCheck} label="Active" value={data?.activeEmployees} color="bg-green-500" />
         <StatCard icon={Building2} label="Departments" value={data?.totalDepartments} color="bg-purple-500" />
         <StatCard icon={UserX} label="New This Month" value={data?.newHiresThisMonth} color="bg-orange-500" />
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1">
+          <AttendanceWidget />
+        </div>
       </div>
 
       {data?.recentHires?.length > 0 && (
