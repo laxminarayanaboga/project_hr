@@ -41,6 +41,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
             """)
     List<Employee> findRecentByCompanyId(@Param("companyId") UUID companyId, Pageable pageable);
 
+    List<Employee> findByCompanyIdAndDepartmentId(UUID companyId, UUID departmentId);
+
+    List<Employee> findByCompanyId(UUID companyId);
+
     @Query(value = """
             SELECT e FROM Employee e
             WHERE e.companyId = :companyId
