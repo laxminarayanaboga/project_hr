@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Users, Building2, GitBranch, Settings, CalendarDays, ClipboardList, Wallet, Clock, Timer } from 'lucide-react'
+import { LayoutDashboard, Users, Building2, GitBranch, Settings, CalendarDays, ClipboardList, Wallet, Clock, Timer, BarChart2, UsersRound } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
 import clsx from 'clsx'
 
@@ -13,6 +13,8 @@ const navItems = [
   { to: '/leave/balances',       icon: Wallet,          label: 'Leave Balances',  roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
   { to: '/attendance',           icon: Clock,           label: 'Attendance',      roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
   { to: '/attendance/overtime',  icon: Timer,           label: 'Overtime',        roles: ['HR_ADMIN', 'MANAGER'] },
+  { to: '/reports/leave',        icon: BarChart2,       label: 'Leave Reports',   roles: ['HR_ADMIN'] },
+  { to: '/dashboard/manager',    icon: UsersRound,      label: 'Team Overview',   roles: ['HR_ADMIN', 'MANAGER'] },
   { to: '/settings/leave-types', icon: Settings,        label: 'Leave Types',     roles: ['HR_ADMIN'] },
   { to: '/settings/company',     icon: Settings,        label: 'Company Settings',roles: ['HR_ADMIN', 'MANAGER', 'EMPLOYEE'] },
 ]

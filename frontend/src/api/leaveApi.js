@@ -26,6 +26,9 @@ export const leaveApi = {
   overrideApprove: (id) => api.post(`/leaves/${id}/override`),
   cancelLeave: (id) => api.delete(`/leaves/${id}`),
 
+  // Manager dashboard
+  managerStats: () => api.get('/dashboard/manager-stats'),
+
   // Leave Balances
   myBalances: () => api.get('/leave-balances/me'),
   balancesForEmployee: (employeeId) => api.get('/leave-balances', { params: { employeeId } }),
