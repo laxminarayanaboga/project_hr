@@ -16,6 +16,8 @@ import com.hrapp.leaverequest.dto.TeamLeaveEntry;
 import com.hrapp.leavetype.LeaveType;
 import com.hrapp.leavetype.LeaveTypeService;
 import com.hrapp.notification.LeaveNotificationService;
+import com.hrapp.push.DeviceTokenService;
+import com.hrapp.push.FcmService;
 import com.hrapp.user.User;
 import com.hrapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,8 @@ public class LeaveRequestService {
     private final LeaveApprovalService leaveApprovalService;
     private final BusinessDayCalculator businessDayCalculator;
     private final LeaveNotificationService notificationService;
+    private final DeviceTokenService deviceTokenService;
+    private final FcmService fcmService;
     private final UserRepository userRepository;
 
     @Transactional
@@ -361,6 +365,11 @@ public class LeaveRequestService {
                 lr.getWorkingDays(),
                 null
         ));
+        fcmService.sendToUser(
+                deviceTokenService.getTokensForUser(user.getId()),
+                "Leave Approved ✓",
+                lt.getName() + " leave approved for " + lr.getStartDate() + " – " + lr.getEndDate()
+        );
     }
 
     private void fireLeaveRejectedNotification(LeaveRequest lr, String reason, UUID companyId) {
@@ -378,5 +387,10 @@ public class LeaveRequestService {
                 lr.getWorkingDays(),
                 reason
         ));
+        fcmService.sendToUser(
+                deviceTokenService.getTokensForUser(user.getId()),
+                "Leave Not Approved",
+                lt.getName() + " leave request was rejected"
+        );
     }
 }

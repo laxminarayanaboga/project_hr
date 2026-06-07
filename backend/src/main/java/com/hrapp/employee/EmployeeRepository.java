@@ -49,6 +49,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
             SELECT e FROM Employee e
             WHERE e.companyId = :companyId
             AND (:status IS NULL OR :status = '' OR e.employmentStatus = :status)
+            AND (:departmentId IS NULL OR e.departmentId = :departmentId)
             AND (:search IS NULL OR :search = ''
                  OR LOWER(e.firstName) LIKE LOWER(CONCAT('%', :search, '%'))
                  OR LOWER(e.lastName)  LIKE LOWER(CONCAT('%', :search, '%'))
@@ -60,6 +61,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
             SELECT COUNT(e) FROM Employee e
             WHERE e.companyId = :companyId
             AND (:status IS NULL OR :status = '' OR e.employmentStatus = :status)
+            AND (:departmentId IS NULL OR e.departmentId = :departmentId)
             AND (:search IS NULL OR :search = ''
                  OR LOWER(e.firstName) LIKE LOWER(CONCAT('%', :search, '%'))
                  OR LOWER(e.lastName)  LIKE LOWER(CONCAT('%', :search, '%'))
@@ -68,6 +70,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
             """)
     Page<Employee> search(@Param("companyId") UUID companyId,
                           @Param("status") String status,
+                          @Param("departmentId") UUID departmentId,
                           @Param("search") String search,
                           Pageable pageable);
 }
