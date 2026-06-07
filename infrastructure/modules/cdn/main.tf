@@ -29,12 +29,52 @@ resource "aws_cloudfront_distribution" "frontend" {
   default_root_object = "index.html"
   price_class         = "PriceClass_100"
 
+  # Origin 1: S3 for the React static files
   origin {
     domain_name              = var.frontend_bucket_domain
     origin_id                = "S3-frontend"
     origin_access_control_id = aws_cloudfront_origin_access_control.frontend.id
   }
 
+  # Origin 2: ALB for the Spring Boot API
+  origin {
+    domain_name = var.alb_dns_name
+    origin_id   = "ALB-backend"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  # /api/* → ALB, no caching, all methods forwarded
+  ordered_cache_behavior {
+    path_pattern           = "/api/*"
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "ALB-backend"
+    viewer_protocol_policy = "https-only"
+    compress               = false
+    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled managed policy
+
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer managed policy
+  }
+
+  # /actuator/* → ALB (health checks, metrics)
+  ordered_cache_behavior {
+    path_pattern           = "/actuator/*"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "ALB-backend"
+    viewer_protocol_policy = "https-only"
+    compress               = false
+    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
+  }
+
+  # Default: S3 static frontend
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
@@ -69,3 +109,4 @@ output "cloudfront_distribution_id" { value = aws_cloudfront_distribution.fronte
 variable "environment"            { type = string }
 variable "frontend_bucket_name"   { type = string }
 variable "frontend_bucket_domain" { type = string }
+variable "alb_dns_name"           { type = string }
