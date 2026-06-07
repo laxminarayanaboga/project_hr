@@ -91,7 +91,7 @@
 | 🔄 | [#34](https://github.com/laxminarayanaboga/project_hr/issues/34) | Attendance clock-in/out on mobile |
 | 🔄 | [#35](https://github.com/laxminarayanaboga/project_hr/issues/35) | Push notifications |
 | ⬜ | [#36](https://github.com/laxminarayanaboga/project_hr/issues/36) | Payslip viewing on mobile |
-| ⬜ | [#37](https://github.com/laxminarayanaboga/project_hr/issues/37) | App Store & Google Play submission |
+| ⏭ | [#37](https://github.com/laxminarayanaboga/project_hr/issues/37) | App Store & Google Play submission *(deferred — requires Apple Developer ($99/yr) + Google Play ($25) accounts — moved to Phase 7)* |
 
 ---
 
@@ -177,3 +177,4 @@
 | ⬜ | [#73](https://github.com/laxminarayanaboga/project_hr/issues/73) | GDPR tools |
 | ⬜ | [#74](https://github.com/laxminarayanaboga/project_hr/issues/74) | 2FA enforcement |
 | ⬜ | [#75](https://github.com/laxminarayanaboga/project_hr/issues/75) | Performance & load testing at scale |
+| ⬜ | [#37](https://github.com/laxminarayanaboga/project_hr/issues/37) | App Store & Google Play submission *(moved from Phase 3 — needs Apple Developer + Google Play accounts)* |
