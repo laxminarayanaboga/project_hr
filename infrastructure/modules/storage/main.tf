@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "documents" {
-  bucket = "hrapp-documents-${var.environment}"
+  bucket        = "hrapp-documents-${var.environment}"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "documents" {
@@ -20,7 +21,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "documents" {
 }
 
 resource "aws_s3_bucket" "frontend" {
-  bucket = "hrapp-frontend-${var.environment}"
+  bucket        = "hrapp-frontend-${var.environment}"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_website_configuration" "frontend" {
