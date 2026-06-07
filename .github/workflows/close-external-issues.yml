@@ -1,0 +1,35 @@
+name: Close external issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    if: github.event.issue.user.login != 'laxminarayanaboga'
+    permissions:
+      issues: write
+    steps:
+      - name: Close and lock issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Thanks for your interest! This is a personal project and issue tracking is managed privately by the maintainer. Please feel free to browse the code.',
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed',
+            });
+            await github.rest.issues.lock({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              lock_reason: 'off-topic',
+            });

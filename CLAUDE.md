@@ -35,8 +35,13 @@ This file gives Claude Code full context so we can start coding immediately.
 
 ## Branch Strategy — Mandatory
 
-> GitHub Pro is not active (personal account). Branch protection cannot be technically enforced on the private repo.
-> This is therefore a **hard convention rule** — Claude must follow it without exception.
+> The repo is public. Branch protection is **technically enforced** on `main` via GitHub branch protection rules:
+> - PR required to merge (no direct pushes)
+> - 1 approving review required (only the repo owner can approve)
+> - Force pushes and branch deletion blocked
+> - Rules apply to admins too
+>
+> This is both a **hard convention rule** and a **technically enforced rule** — Claude must follow it without exception.
 
 ### The rule — simple
 
