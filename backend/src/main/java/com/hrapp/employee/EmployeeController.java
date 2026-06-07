@@ -34,11 +34,12 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<EmployeeResponse>>> list(
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) UUID departmentId,
             @RequestParam(required = false, defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(ApiResponse.success(
-                employeeService.list(status, search, PageRequest.of(page, size)),
+                employeeService.list(status, departmentId, search, PageRequest.of(page, size)),
                 "Employees retrieved"));
     }
 

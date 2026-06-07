@@ -55,14 +55,25 @@ export interface LeaveRequest {
 }
 
 export interface AttendanceRecord {
-  id: string;
-  employeeId: string;
-  clockInTime: string;
-  clockOutTime?: string;
+  id?: string;
+  recordId?: string;
+  employeeId?: string;
+  clockIn: string;
+  clockOut?: string | null;
   clockInLatitude?: number;
   clockInLongitude?: number;
-  hoursWorked?: number;
-  date: string;
+  hoursWorked?: number | null;
+  active?: boolean;
+}
+
+export interface TeamLeaveEntry {
+  requestId: string;
+  employeeId: string;
+  employeeName: string;
+  leaveTypeName: string;
+  startDate: string;
+  endDate: string;
+  status?: string;
 }
 
 export interface ApiResponse<T> {

@@ -38,17 +38,17 @@ export default function ClockInScreen() {
   }, [loadToday]);
 
   useEffect(() => {
-    if (!record?.clockInTime || record.clockOutTime) {
+    if (!record?.clockIn || record.clockOut) {
       return;
     }
     const interval = setInterval(() => {
-      setElapsed(getHoursWorked(record.clockInTime));
+      setElapsed(getHoursWorked(record.clockIn));
     }, 60000);
-    setElapsed(getHoursWorked(record.clockInTime));
+    setElapsed(getHoursWorked(record.clockIn));
     return () => clearInterval(interval);
   }, [record]);
 
-  const clockedIn = !!record?.clockInTime && !record?.clockOutTime;
+  const clockedIn = !!record?.clockIn && !record?.clockOut;
 
   const handleClockIn = async () => {
     setActionLoading(true);
@@ -109,10 +109,10 @@ export default function ClockInScreen() {
       {record && (
         <View style={styles.shiftCard}>
           <Text style={styles.shiftTitle}>Today's Shift</Text>
-          <ShiftRow label="Clock In" value={record.clockInTime ? formatTime(record.clockInTime) : '—'} />
+          <ShiftRow label="Clock In" value={record.clockIn ? formatTime(record.clockIn) : '—'} />
           <ShiftRow
             label="Clock Out"
-            value={record.clockOutTime ? formatTime(record.clockOutTime) : '—'}
+            value={record.clockOut ? formatTime(record.clockOut) : '—'}
           />
           {record.hoursWorked != null && (
             <ShiftRow label="Hours" value={`${record.hoursWorked.toFixed(1)}h`} />
@@ -126,7 +126,7 @@ export default function ClockInScreen() {
         </View>
       )}
 
-      {!clockedIn && !record?.clockOutTime && (
+      {!clockedIn && !record?.clockOut && (
         <View style={styles.locationToggle}>
           <Text style={styles.locationLabel}>Capture location</Text>
           <Switch
@@ -138,7 +138,7 @@ export default function ClockInScreen() {
         </View>
       )}
 
-      {!record?.clockOutTime && (
+      {!record?.clockOut && (
         <TouchableOpacity
           style={[
             styles.clockBtn,

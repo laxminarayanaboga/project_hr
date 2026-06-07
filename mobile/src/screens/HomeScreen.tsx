@@ -1,14 +1,16 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useAuthStore} from '../store/authStore';
 import {useNavigation} from '@react-navigation/native';
 
 export default function HomeScreen() {
   const {user} = useAuthStore();
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.container} contentContainerStyle={[styles.content, {paddingTop: insets.top + 16}]}>
       <Text style={styles.greeting}>
         Hello, {user?.firstName ?? 'there'} 👋
       </Text>
@@ -50,7 +52,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: '#f0f2f5'},
   content: {padding: 20},
-  greeting: {fontSize: 24, fontWeight: '700', color: '#1a1a2e', marginTop: 10},
+  greeting: {fontSize: 24, fontWeight: '700', color: '#1a1a2e'},
   role: {fontSize: 14, color: '#888', marginBottom: 24, textTransform: 'capitalize'},
   grid: {flexDirection: 'row', flexWrap: 'wrap', gap: 14},
   card: {

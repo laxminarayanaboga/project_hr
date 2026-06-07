@@ -22,23 +22,11 @@ const STATUS_COLORS: Record<string, string> = {
 export default function MyLeaveHistoryScreen() {
   const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-
-  const fetchLeaves = async (pg: number) => {
-    setLoading(true);
-    try {
-      const res = await leavesApi.myLeaves({page: pg, size: 15});
-      const {content, totalPages} = res.data.data;
-      setLeaves(prev => (pg === 0 ? content : [...prev, ...content]));
-      setHasMore(pg < totalPages - 1);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchLeaves(0);
+    leavesApi.myLeaves()
+      .then(res => setLeaves(res.data.data))
+      .finally(() => setLoading(false));
   }, []);
 
   const cancel = (id: string) => {
@@ -88,14 +76,6 @@ export default function MyLeaveHistoryScreen() {
       data={leaves}
       keyExtractor={l => l.id}
       renderItem={renderItem}
-      onEndReached={() => {
-        if (!loading && hasMore) {
-          const next = page + 1;
-          setPage(next);
-          fetchLeaves(next);
-        }
-      }}
-      onEndReachedThreshold={0.3}
       ListFooterComponent={loading ? <ActivityIndicator style={styles.loader} /> : null}
       ListEmptyComponent={!loading ? <Text style={styles.empty}>No leave history</Text> : null}
       contentContainerStyle={styles.content}

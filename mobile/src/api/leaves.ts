@@ -4,7 +4,7 @@ import {
   LeaveBalance,
   LeaveRequest,
   LeaveType,
-  PagedResponse,
+  TeamLeaveEntry,
 } from '../types';
 
 export const leavesApi = {
@@ -16,18 +16,16 @@ export const leavesApi = {
   }) =>
     apiClient.post<ApiResponse<LeaveRequest>>('/leaves', payload),
 
-  myLeaves: (params?: {page?: number; size?: number}) =>
-    apiClient.get<ApiResponse<PagedResponse<LeaveRequest>>>('/leaves/my', {
-      params,
-    }),
+  myLeaves: () =>
+    apiClient.get<ApiResponse<LeaveRequest[]>>('/leaves/my'),
 
   pending: (params?: {page?: number; size?: number}) =>
     apiClient.get<ApiResponse<PagedResponse<LeaveRequest>>>('/leaves/pending', {
       params,
     }),
 
-  teamLeaves: (params?: {startDate?: string; endDate?: string}) =>
-    apiClient.get<ApiResponse<LeaveRequest[]>>('/leaves/team', {params}),
+  teamLeaves: (params: {from: string; to: string}) =>
+    apiClient.get<ApiResponse<TeamLeaveEntry[]>>('/leaves/team', {params}),
 
   approve: (id: string, comment?: string) =>
     apiClient.put(`/leaves/${id}/approve`, {comment}),

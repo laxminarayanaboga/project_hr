@@ -126,10 +126,10 @@ class EmployeeServiceTest {
 
     @Test
     void list_returnsPagedResults() {
-        when(employeeRepository.search(eq(COMPANY_ID), any(), any(), any(Pageable.class)))
+        when(employeeRepository.search(eq(COMPANY_ID), any(), any(), any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(emp)));
 
-        PageResponse<EmployeeResponse> result = employeeService.list(null, null, PageRequest.of(0, 20));
+        PageResponse<EmployeeResponse> result = employeeService.list(null, null, null, PageRequest.of(0, 20));
 
         assertThat(result.content()).hasSize(1);
         assertThat(result.totalElements()).isEqualTo(1);
@@ -138,10 +138,10 @@ class EmployeeServiceTest {
 
     @Test
     void list_returnsEmpty_whenNoEmployees() {
-        when(employeeRepository.search(eq(COMPANY_ID), any(), any(), any(Pageable.class)))
+        when(employeeRepository.search(eq(COMPANY_ID), any(), any(), any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        PageResponse<EmployeeResponse> result = employeeService.list("ACTIVE", null, PageRequest.of(0, 20));
+        PageResponse<EmployeeResponse> result = employeeService.list("ACTIVE", null, null, PageRequest.of(0, 20));
 
         assertThat(result.content()).isEmpty();
         assertThat(result.totalElements()).isZero();

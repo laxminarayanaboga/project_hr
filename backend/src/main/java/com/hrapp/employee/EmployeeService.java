@@ -55,9 +55,9 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<EmployeeResponse> list(String status, String search, Pageable pageable) {
+    public PageResponse<EmployeeResponse> list(String status, UUID departmentId, String search, Pageable pageable) {
         UUID companyId = TenantContext.getCurrentCompany();
-        Page<Employee> page = employeeRepository.search(companyId, status, search, pageable);
+        Page<Employee> page = employeeRepository.search(companyId, status, departmentId, search, pageable);
         return PageResponse.of(page.map(e -> toResponse(e, batchDeptNames(page.getContent()), batchManagerNames(page.getContent()))));
     }
 

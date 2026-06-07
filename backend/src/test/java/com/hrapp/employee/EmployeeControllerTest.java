@@ -106,7 +106,7 @@ class EmployeeControllerTest {
     void list_200_returnsPaginatedResults() throws Exception {
         PageResponse<EmployeeResponse> page = new PageResponse<>(
                 List.of(stubEmployee(EMP_ID, "Jane", "Smith")), 1L, 1, false);
-        when(employeeService.list(any(), any(), any(Pageable.class))).thenReturn(page);
+        when(employeeService.list(any(), any(), any(), any(Pageable.class))).thenReturn(page);
 
         mvc.perform(get("/api/v1/employees"))
                 .andExpect(status().isOk())
@@ -120,12 +120,12 @@ class EmployeeControllerTest {
     @Test
     void list_200_acceptsStatusAndSearchParams() throws Exception {
         PageResponse<EmployeeResponse> page = new PageResponse<>(List.of(), 0L, 0, false);
-        when(employeeService.list(eq("ACTIVE"), eq("jane"), any(Pageable.class))).thenReturn(page);
+        when(employeeService.list(eq("ACTIVE"), any(), eq("jane"), any(Pageable.class))).thenReturn(page);
 
         mvc.perform(get("/api/v1/employees?status=ACTIVE&search=jane"))
                 .andExpect(status().isOk());
 
-        verify(employeeService).list(eq("ACTIVE"), eq("jane"), any(Pageable.class));
+        verify(employeeService).list(eq("ACTIVE"), any(), eq("jane"), any(Pageable.class));
     }
 
     // ── GET /employees/:id ────────────────────────────────────────────────────

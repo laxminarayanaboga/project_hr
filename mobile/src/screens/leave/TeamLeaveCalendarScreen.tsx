@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {leavesApi} from '../../api/leaves';
-import {LeaveRequest} from '../../types';
+import {TeamLeaveEntry} from '../../types';
 import {formatDate, formatDateForApi, weekBounds} from '../../utils/dateUtils';
 import {addWeeks, subWeeks} from 'date-fns';
 
@@ -21,14 +21,14 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function TeamLeaveCalendarScreen() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
+  const [leaves, setLeaves] = useState<TeamLeaveEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const {start, end} = weekBounds(currentWeek);
     setLoading(true);
     leavesApi
-      .teamLeaves({startDate: start, endDate: end})
+      .teamLeaves({from: start, to: end})
       .then(r => setLeaves(r.data.data))
       .finally(() => setLoading(false));
   }, [currentWeek]);
@@ -62,8 +62,8 @@ export default function TeamLeaveCalendarScreen() {
           ) : (
             leaves.map(leave => (
               <View
-                key={leave.id}
-                style={[styles.row, {backgroundColor: STATUS_COLORS[leave.status] ?? '#e5e7eb'}]}
+                key={leave.requestId}
+                style={[styles.row, {backgroundColor: STATUS_COLORS[leave.status ?? ''] ?? '#e5e7eb'}]}
                 testID={`team-leave-${leave.id}`}>
                 <Text style={styles.rowName}>{leave.employeeName}</Text>
                 <View style={styles.rowRight}>

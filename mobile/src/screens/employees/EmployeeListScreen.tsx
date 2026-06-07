@@ -3,6 +3,7 @@ import {
   View,
   Text,
   FlatList,
+  ScrollView,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -100,23 +101,25 @@ export default function EmployeeListScreen({navigation}: EmployeeListScreenProps
         onChangeText={setSearch}
         testID="search-input"
       />
-      <FlatList
+      <ScrollView
         horizontal
-        data={[{id: null, name: 'All'} as any, ...departments]}
-        keyExtractor={d => String(d.id)}
-        renderItem={({item}) => (
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.chips}
+        style={styles.chipsList}>
+        {[{id: null, name: 'All'} as any, ...departments].map(dept => (
           <TouchableOpacity
-            style={[styles.chip, selectedDept === item.id && styles.chipActive]}
-            onPress={() => setSelectedDept(item.id)}>
-            <Text style={[styles.chipText, selectedDept === item.id && styles.chipTextActive]}>
-              {item.name}
+            key={String(dept.id)}
+            style={[styles.chip, selectedDept === dept.id && styles.chipActive]}
+            onPress={() => setSelectedDept(dept.id)}
+            activeOpacity={0.7}>
+            <Text style={[styles.chipText, selectedDept === dept.id && styles.chipTextActive]}>
+              {dept.name}
             </Text>
           </TouchableOpacity>
-        )}
-        contentContainerStyle={styles.chips}
-        showsHorizontalScrollIndicator={false}
-      />
+        ))}
+      </ScrollView>
       <FlatList
+        style={styles.list}
         data={employees}
         keyExtractor={e => e.id}
         renderItem={renderEmployee}
@@ -140,6 +143,8 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     fontSize: 15,
   },
+  chipsList: {flexGrow: 0, flexShrink: 0},
+  list: {flex: 1},
   chips: {paddingHorizontal: 12, paddingBottom: 8, gap: 8},
   chip: {
     paddingVertical: 6,

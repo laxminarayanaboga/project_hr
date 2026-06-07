@@ -57,16 +57,16 @@ export default function WeeklyHoursScreen() {
       ) : (
         <FlatList
           data={records}
-          keyExtractor={r => r.id}
+          keyExtractor={r => r.id ?? r.recordId ?? r.clockIn}
           renderItem={({item}) => (
-            <View style={styles.row} testID={`record-${item.id}`}>
-              <Text style={styles.rowDate}>{formatDate(item.date)}</Text>
+            <View style={styles.row} testID={`record-${item.id ?? item.recordId}`}>
+              <Text style={styles.rowDate}>{item.clockIn ? formatDate(item.clockIn) : '—'}</Text>
               <View style={styles.rowTimes}>
                 <Text style={styles.rowTime}>
-                  In: {item.clockInTime ? formatTime(item.clockInTime) : '—'}
+                  In: {item.clockIn ? formatTime(item.clockIn) : '—'}
                 </Text>
                 <Text style={styles.rowTime}>
-                  Out: {item.clockOutTime ? formatTime(item.clockOutTime) : '—'}
+                  Out: {item.clockOut ? formatTime(item.clockOut) : '—'}
                 </Text>
               </View>
               <Text style={styles.rowHours}>
