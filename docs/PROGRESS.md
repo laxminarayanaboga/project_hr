@@ -90,7 +90,7 @@
 | ✅ | [#33](https://github.com/laxminarayanaboga/project_hr/issues/33) | Leave request & approval on mobile |
 | ✅ | [#34](https://github.com/laxminarayanaboga/project_hr/issues/34) | Attendance clock-in/out on mobile |
 | ✅ | [#35](https://github.com/laxminarayanaboga/project_hr/issues/35) | Push notifications |
-| ⬜ | [#36](https://github.com/laxminarayanaboga/project_hr/issues/36) | Payslip viewing on mobile |
+| ⏭ | [#36](https://github.com/laxminarayanaboga/project_hr/issues/36) | Payslip viewing on mobile *(deferred — depends on Phase 6 payroll engine; will build web + mobile together in Phase 6)* |
 | ⏭ | [#37](https://github.com/laxminarayanaboga/project_hr/issues/37) | App Store & Google Play submission *(deferred — requires Apple Developer ($99/yr) + Google Play ($25) accounts — moved to Phase 7)* |
 
 ---
@@ -159,6 +159,7 @@
 | ⬜ | [#63](https://github.com/laxminarayanaboga/project_hr/issues/63) | BACS bank transfer export |
 | ⬜ | [#64](https://github.com/laxminarayanaboga/project_hr/issues/64) | Payroll history & audit trail |
 | ⬜ | [#65](https://github.com/laxminarayanaboga/project_hr/issues/65) | Year-end P60 generation |
+| ⬜ | [#36](https://github.com/laxminarayanaboga/project_hr/issues/36) | Payslip viewing on mobile *(moved from Phase 3 — build alongside web payslip UI when payroll engine exists)* |
 
 ---
 
