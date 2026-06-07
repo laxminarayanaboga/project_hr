@@ -59,10 +59,11 @@ module "email" {
 }
 
 module "cdn" {
-  source                = "./modules/cdn"
-  environment           = var.environment
-  frontend_bucket_name  = module.storage.frontend_bucket_name
+  source                 = "./modules/cdn"
+  environment            = var.environment
+  frontend_bucket_name   = module.storage.frontend_bucket_name
   frontend_bucket_domain = module.storage.frontend_bucket_domain
+  alb_dns_name           = module.ecs.alb_dns_name
 }
 
 module "ecs" {
