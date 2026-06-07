@@ -27,7 +27,7 @@ ext {
     jjwtVersion     = '0.12.6'
     mapstructVersion = '1.6.3'
     lombokVersion   = '1.18.46'
-    awsSdkVersion   = '1.12.780'
+    awsSdkVersion   = '1.12.797'
 }
 
 dependencies {
