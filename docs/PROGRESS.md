@@ -100,13 +100,13 @@
 
 | Status | Issue | Story |
 |--------|-------|-------|
-| ⬜ | [#95](https://github.com/laxminarayanaboga/project_hr/issues/95) | Complete Terraform for staging (RDS, ECS Fargate, S3, CloudFront, ALB, Secrets Manager) |
-| ⬜ | [#96](https://github.com/laxminarayanaboga/project_hr/issues/96) | Activate GitHub Actions CI/CD pipelines (backend + frontend) |
-| ⬜ | [#97](https://github.com/laxminarayanaboga/project_hr/issues/97) | Wire AWS SES for transactional email on staging |
-| ⬜ | [#98](https://github.com/laxminarayanaboga/project_hr/issues/98) | Wire AWS S3 for employee document storage on staging |
-| ⬜ | [#99](https://github.com/laxminarayanaboga/project_hr/issues/99) | Custom domain + SSL (Route 53 + ACM) |
-| ⬜ | [#100](https://github.com/laxminarayanaboga/project_hr/issues/100) | CloudWatch monitoring & alerting |
-| ⬜ | [#101](https://github.com/laxminarayanaboga/project_hr/issues/101) | Staging smoke tests — Playwright E2E against live staging URL |
+| ✅ | [#95](https://github.com/laxminarayanaboga/project_hr/issues/95) | Complete Terraform for staging (RDS, ECS Fargate, S3, CloudFront, ALB, Secrets Manager) |
+| ✅ | [#96](https://github.com/laxminarayanaboga/project_hr/issues/96) | Activate GitHub Actions CI/CD pipelines (backend + frontend) |
+| ✅ | [#97](https://github.com/laxminarayanaboga/project_hr/issues/97) | Wire AWS SES for transactional email on staging |
+| ✅ | [#98](https://github.com/laxminarayanaboga/project_hr/issues/98) | Wire AWS S3 for employee document storage on staging |
+| ⏭ | [#99](https://github.com/laxminarayanaboga/project_hr/issues/99) | Custom domain + SSL *(skipped — no custom domain, using default ALB/CloudFront URLs)* |
+| ✅ | [#100](https://github.com/laxminarayanaboga/project_hr/issues/100) | CloudWatch monitoring & alerting |
+| ✅ | [#101](https://github.com/laxminarayanaboga/project_hr/issues/101) | Staging smoke tests — Playwright E2E against live staging URL |
 
 ---
 

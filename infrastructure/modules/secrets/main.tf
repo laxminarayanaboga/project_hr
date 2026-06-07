@@ -12,7 +12,6 @@ resource "aws_secretsmanager_secret_version" "jwt" {
   }
 }
 
-output "db_secret_arn"  { value = "" }
 output "jwt_secret_arn" { value = aws_secretsmanager_secret.jwt.arn }
 
 variable "environment"      { type = string }

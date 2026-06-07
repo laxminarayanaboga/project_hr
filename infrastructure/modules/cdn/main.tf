@@ -5,6 +5,24 @@ resource "aws_cloudfront_origin_access_control" "frontend" {
   signing_protocol                  = "sigv4"
 }
 
+resource "aws_s3_bucket_policy" "frontend" {
+  bucket = var.frontend_bucket_name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "cloudfront.amazonaws.com" }
+      Action    = "s3:GetObject"
+      Resource  = "arn:aws:s3:::${var.frontend_bucket_name}/*"
+      Condition = {
+        StringEquals = {
+          "AWS:SourceArn" = aws_cloudfront_distribution.frontend.arn
+        }
+      }
+    }]
+  })
+}
+
 resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   is_ipv6_enabled     = true
@@ -45,9 +63,9 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 }
 
-output "cloudfront_url" { value = "https://${aws_cloudfront_distribution.frontend.domain_name}" }
+output "cloudfront_url"             { value = "https://${aws_cloudfront_distribution.frontend.domain_name}" }
+output "cloudfront_distribution_id" { value = aws_cloudfront_distribution.frontend.id }
 
-variable "environment"           { type = string }
-variable "frontend_bucket_name"  { type = string }
+variable "environment"            { type = string }
+variable "frontend_bucket_name"   { type = string }
 variable "frontend_bucket_domain" { type = string }
-variable "domain_name"           { type = string }

@@ -2,8 +2,11 @@ name: Backend CI/CD
 
 on:
   workflow_dispatch:
-    # Auto-triggers disabled — personal account, minimise billing.
-    # Enable push/pull_request triggers when ready to wire up staging deploy.
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
 
 env:
   AWS_REGION: eu-west-2
@@ -36,11 +39,11 @@ jobs:
         with:
           java-version: "25"
           distribution: temurin
-          cache: maven
+          cache: gradle
 
       - name: Run tests
         working-directory: backend
-        run: mvn -q test
+        run: ./gradlew test --no-daemon -q
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/hrapp_test
           SPRING_DATASOURCE_USERNAME: hrapp
@@ -54,7 +57,7 @@ jobs:
     name: Build & Deploy
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - uses: actions/checkout@v4
@@ -72,20 +75,19 @@ jobs:
         with:
           java-version: "25"
           distribution: temurin
-          cache: maven
+          cache: gradle
 
       - name: Build JAR
         working-directory: backend
-        run: mvn -q package -DskipTests
+        run: ./gradlew bootJar --no-daemon -q
 
       - name: Build & push Docker image
         id: build-image
-        working-directory: backend
         env:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG backend/
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 

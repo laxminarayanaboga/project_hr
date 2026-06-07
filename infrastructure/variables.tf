@@ -19,23 +19,13 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "domain_name" {
-  description = "Root domain name (e.g. hrapp.co.uk)"
-  type        = string
-}
-
 variable "ses_from_email" {
-  description = "Verified SES sender email"
-  type        = string
-}
-
-variable "ecr_repository_url" {
-  description = "ECR repository URL for the backend Docker image"
+  description = "SES sender email (must be verified in AWS SES)"
   type        = string
 }
 
 variable "image_tag" {
-  description = "Docker image tag to deploy"
+  description = "Docker image tag to deploy (overridden by CI on each deploy)"
   type        = string
   default     = "latest"
 }
