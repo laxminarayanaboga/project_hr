@@ -95,6 +95,21 @@
 
 ---
 
+## Phase 3b — AWS Staging Deploy
+> Target: Month 7 (after Phase 3) | Milestone: [Phase 3b](https://github.com/laxminarayanaboga/project_hr/milestone/8)
+
+| Status | Issue | Story |
+|--------|-------|-------|
+| ⬜ | [#95](https://github.com/laxminarayanaboga/project_hr/issues/95) | Complete Terraform for staging (RDS, ECS Fargate, S3, CloudFront, ALB, Secrets Manager) |
+| ⬜ | [#96](https://github.com/laxminarayanaboga/project_hr/issues/96) | Activate GitHub Actions CI/CD pipelines (backend + frontend) |
+| ⬜ | [#97](https://github.com/laxminarayanaboga/project_hr/issues/97) | Wire AWS SES for transactional email on staging |
+| ⬜ | [#98](https://github.com/laxminarayanaboga/project_hr/issues/98) | Wire AWS S3 for employee document storage on staging |
+| ⬜ | [#99](https://github.com/laxminarayanaboga/project_hr/issues/99) | Custom domain + SSL (Route 53 + ACM) |
+| ⬜ | [#100](https://github.com/laxminarayanaboga/project_hr/issues/100) | CloudWatch monitoring & alerting |
+| ⬜ | [#101](https://github.com/laxminarayanaboga/project_hr/issues/101) | Staging smoke tests — Playwright E2E against live staging URL |
+
+---
+
 ## Phase 4 — Performance Reviews
 > Target: Months 7–9 | Milestone: [Phase 4](https://github.com/laxminarayanaboga/project_hr/milestone/4)
 
